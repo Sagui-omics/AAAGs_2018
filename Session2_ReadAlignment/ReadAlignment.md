@@ -1,5 +1,4 @@
-
-## Sessions 2 and 3: Assembly, variant calling, variant filtering
+## Session 2 Reference Genomes, Filtering, and Read Assembly
 
 ### File formats covered
 fasta
@@ -13,8 +12,19 @@ vcf
 - how do we prepare a reference for read mapping?
   - bwa index, fai index (samtools faidx), sequence dictionary
 
+### Step 2 -- Fastq quality control
+- what is a fastq?
+- basics of exploring a fastq
+  - bioawk
+- how do we explore fastq quality?
+  - fastqc
+  - multiqc
+- how do we trim fastqs?
+  - bbduk (also trimmomatic/trim galore/etc.)
+  - why and when do we trim fastqs?
+    - what is an adapter?
 
-### Step 1 commands 
+### Master list of commands 
 
 Note: ensure Miniconda or Anaconda is installed first. Also, the conda config commands *must be run in this order*
 
@@ -58,21 +68,7 @@ fastqc -o fastqc_trimmed_results trimmed_fastqs/CEU_NA06986_trimmed_read1.fastq.
 
 ### Trimmed Multiqc
 export LC_ALL=en_US.UTF-8 && export LANG=en_US.UTF-8 && {params.multiqc} -o multiqc_trimmed_results fastqc_trimmed_results"
-```
 
-### Step 2 -- Fastq quality control
-- what is a fastq?
-- basics of exploring a fastq
-  - bioawk
-- how do we explore fastq quality?
-  - fastqc
-  - multiqc
-- how do we trim fastqs?
-  - bbduk (also trimmomatic/trim galore/etc.)
-  - why and when do we trim fastqs?
-    - what is an adapter?
-
-```
 ### Mapping reads (also fixmate and sorting)
 # Example for one sample
 bwa mem -R '@RG\tID:YRI_NA18498\tSM:YRI_NA18498' reference/human_v37_MT.fasta trimmed_fastqs/YRI_NA18498_trimmed_read1.fastq.gz trimmed_fastqs/YRI_NA18498_trimmed_read2.fastq.gz| samtools fixmate -O bam - - | samtools sort -O bam -o bams/YRI_NA18498.human_v37_MT.sorted.bam
