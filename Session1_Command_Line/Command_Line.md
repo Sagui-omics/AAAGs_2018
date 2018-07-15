@@ -50,7 +50,8 @@ What happens in typing the command pwd?
 Asia-MacBook-Pro-2:~ arcova$ pwd
 Asia-MacBook-Pro-2:~ arcova$ ls
 ```
-Pick a directory name and type cd <chosen directory name>
+Pick a directory name and type cd -chosen directory name-
+
 What happens after you type this ?
 
 ```
