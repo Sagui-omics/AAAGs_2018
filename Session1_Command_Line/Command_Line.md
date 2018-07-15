@@ -1,7 +1,7 @@
 # Introduction to Command Line
 (images and lesson adapted from http://swcarpentry.github.io/)
 
-## 1. Log into guest account 
+## 1. Log into guest account. 
 
 ```
 Asia-MacBook-Pro-2:~ arcova$ ssh guestX@rush.ccr.buffalo.edu
@@ -10,7 +10,7 @@ Asia-MacBook-Pro-2:~ arcova$ Password:
 
 ## 2. Command line prompt
 
-The command ls gives the contents of your current directory
+The command ls gives the contents of your current directory.
 ```
 Asia-MacBook-Pro-2:~ arcova$ ls 
 NEX2_22_S2_R1_fastqc					
@@ -33,7 +33,7 @@ What happens at the prompt when you modify the ls command with the flag "-l -h" 
 Asia-MacBook-Pro-2:~ arcova$ ls -l -h 
 ```
 
-Getting help for commands 
+Getting help for commands: 
 ```
 Asia-MacBook-Pro-2:~ arcova$ ls --help
 Asia-MacBook-Pro-2:~ arcova$ man ls 
@@ -50,7 +50,7 @@ What happens in typing the command pwd?
 Asia-MacBook-Pro-2:~ arcova$ pwd
 Asia-MacBook-Pro-2:~ arcova$ ls
 ```
-Pick a directory name and type cd -chosen directory name-
+Pick a directory name and type cd -chosen directory name-.
 
 What happens after you type this ?
 
@@ -77,7 +77,6 @@ This command will bring you up one directory level.
 ```
 Asia-MacBook-Pro-2:~ arcova$ cd ..
 ```
-
 ---
 
 ## 4. Working with files and directories 
@@ -91,13 +90,14 @@ Move into your newly made directory.
 
 ```
 Asia-MacBook-Pro-2:~ arcova$ nano my_first_text.txt
+Asia-MacBook-Pro-2:~ arcova$ ls
 ```
 this command will open a new file called "my\_first\_text.txt" in the text editor nano 
 write "Hello World!". 
 To save the file press Ctrl-O and return and to exit nano press Ctrl-X.
 Run the commands to check your current directory and generate a listing of current files. 
 
-On of the functions of the cat command is to display the contents of the file to stdout (i.e. the screen).
+One of the functions of the cat command is to display the contents of the file to stdout (i.e. the screen).
 ```
 Asia-MacBook-Pro-2:~ arcova$ cat my_first_text.txt 
 ```
