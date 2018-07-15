@@ -22,7 +22,7 @@ Check that setup worked (wouldn't recommend doing this w/o row specification)
 ```
 summary(org\_geno\[,4:8\]) plot(org\_geno,which=13)
 ```
-###Run the mini-GWAS
+### Run the mini-GWAS
 ```
 suborg\_geno&lt;-org\_geno\[,1:1000\]
 
