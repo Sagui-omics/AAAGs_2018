@@ -10,7 +10,7 @@ Asia-MacBook-Pro-2:~ arcova$ Password:
 
 ## 2. Command line prompt
 
-ls is a command that gives the contents of your current directory
+The command ls gives the contents of your current directory
 ```
 Asia-MacBook-Pro-2:~ arcova$ ls 
 NEX2_22_S2_R1_fastqc					
@@ -73,11 +73,10 @@ How would you get a file listing of a directory other than your current director
 
 Try moving into one of the subdirectories of your home directory. 
 
+This command will bring you up one directory level. 
 ```
 Asia-MacBook-Pro-2:~ arcova$ cd ..
 ```
-
-This command will bring you up one directory level. 
 
 ---
 
@@ -98,20 +97,22 @@ write "Hello World!".
 To save the file press Ctrl-O and return and to exit nano press Ctrl-X.
 Run the commands to check your current directory and generate a listing of current files. 
 
+On of the functions of the cat command is to display the contents of the file to stdout (i.e. the screen).
+```
+Asia-MacBook-Pro-2:~ arcova$ cat my_first_text.txt 
+```
+This command will make a new copy of "my\_first\_text.txt" with a different file name
 
 ```
 Asia-MacBook-Pro-2:~ arcova$ cp my_first_text.txt my_other_text.txt
 ```
-This command will make a new copy of "my\_first\_text.txt" with a different file name
-
-
-```
-Asia-MacBook-Pro-2:~ arcova$ rm my_first_text.txt
-```
 
 This command will remove the file "my\_first\_text.txt"
 
-
+```
+Asia-MacBook-Pro-2:~ arcova$ rm my_first_text.txt
+Asia-MacBook-Pro-2:~ arcova$  ls
+```
 
 ## 5. A simple bioinformatics command 
 
