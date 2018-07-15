@@ -31,22 +31,22 @@ Topics: Enrichment Analysis
 Instructor: Drs. Antonio Herrera  (Stony Brook University)  
 Info: Exploring genomic data for GWAS variants, regulatory activity, etc  
 
-**Session 5**
+**Session 6**
 Topics: Structural Variants and Haplotype Interval Matching  
-Instructors: Dr. Omer Gokcumen and Yen-Lung Onta Lin  
+Instructors: Dr. Omer Gokcumen and Yen-Lung Onta Lin (University of Buffalo)  
 Info: Investigate genomic outliers and associated haplotypes for their impact on gene expression function, loss of function variants, etc.  
 
-**Session 6**  
+**Session 7**  
 Topics: Admixture and Genetic Introgression Analysis  
 Instructor: Dr. Krishna Veeramah  (Stony Brook University)  
 Info:
 
-**Session 7**  
+**Session 8**  
 Topics:  Data Management and Visualization  
 Instructor: Dr. Ellen Quillen (Wake Forest University)  
 Info: Basics of manipulating data in Tidy R, Tidyverse, Bioconductor, etc.  
 
-**Session 8**  
+**Session 9**  
 Topics:  Data Management and Visualization  
 Instructor: Dr. Genevieve Housman (University of Chicago)  
 Info: Basics of Visualizing data in R and ggplot2 
