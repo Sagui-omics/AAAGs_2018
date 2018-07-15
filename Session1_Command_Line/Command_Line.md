@@ -22,7 +22,16 @@ NEX2_23_S3_R1_fastqc.zip
 ```
 What happens at the prompt when you modify the ls command with the flag "-l" ?
 
+```
+Asia-MacBook-Pro-2:~ arcova$ ls -l
+```
+
 What happens at the prompt when you modify the ls command with the flag "-l -h" ?
+
+
+```
+Asia-MacBook-Pro-2:~ arcova$ ls -l -h 
+```
 
 Getting help for commands 
 ```
@@ -34,24 +43,22 @@ What are the other available ls flags?
 ---
 
 ## 3. Moving around directories and navigating files 
-![alt text](/Users/arcova/Downloads/filesystem.svg)
-
-```
-Asia-MacBook-Pro-2:~ arcova$ pwd
-```
+![alt text](filesystem.svg)
 
 What happens in typing the command pwd?
-
 ```
-Asia-MacBook-Pro-2:~ arcova$ cd <pick a directory name>
+Asia-MacBook-Pro-2:~ arcova$ pwd
 ```
 What happens after you type cd ?
 
 ```
+Asia-MacBook-Pro-2:~ arcova$ cd <pick a directory name>
+```
+What happens after you type cd ~/? 
+
+```
 Asia-MacBook-Pro-2:~ arcova$ cd ~/
 ```
-
-What happens after you type cd ~/? 
 
 Hint, the root directory in *nix systems is symbolized by "/," and at the front of a file or directory name it signifies the root directory is signified. 
 
