@@ -48,8 +48,10 @@ What are the other available ls flags?
 What happens in typing the command pwd?
 ```
 Asia-MacBook-Pro-2:~ arcova$ pwd
+Asia-MacBook-Pro-2:~ arcova$ ls
 ```
-What happens after you type cd ?
+Pick a directory name and type cd <chosen directory name>
+What happens after you type this ?
 
 ```
 Asia-MacBook-Pro-2:~ arcova$ cd <pick a directory name>
