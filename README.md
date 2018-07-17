@@ -5,20 +5,21 @@ University of Buffalo
 
 **Session 1**  
 Topics: Task Automation - Version Control with Git  
-Instructor: Dr. Joanna Malukiewicz (Arizona State University)  
-Info: Introduction to command line, organizing files and analyses, version control, and automation. 
+Instructor: Dr. Joanna Malukiewicz (German Primate Center, Instituto Adolfo Lutz, Universidade Federal do Vale São Franciso)  
+Info: Introduction to command line, version control, and automation. 
 
 **Session 2**  
-Topics: BWA, GATK, Samtools, and other resources for sequence read alignment.  
-Instructor: Dr. Tim Webster (Arizona State University)  
-Info: Basics of sequencing and BAM files: read depth, false-positive, false-negative, etc.  
-Run alignment pipeline starting with a fastq file and producing a BAM/SAM file
+Topics: The Basics of Read Mapping and Variant Calling  
+Instructor: Dr. Tim Webster (Arizona State University and University of Utah)  
+Info: Introduction to sequencing reads (fastq files), read mapping (SAM/BAM files), and variant calling (VCF files). 
+Topics also include read trimming and quality control, duplicate removal, and BAM file analysis and exploration. Run alignment pipeline starting with a raw fastq file and producing a raw VCF file.  
 
 **Session 3**  
 Topics: The basics of VCF files  
-Instructor: Dr. Maria Nieves-Colón (Arizona State University)  
-Info: Output data details: SNP density, Fst, Tajima's D, heterozygosity, etc.  
-Run varient calling pipeline starting with a BAM/SAM file and producing a VCF file
+Instructor: Dr. Maria Nieves-Colón (Arizona State University and LANGEBIO-CINVESTAV)  
+Info: VCF format and introduction to variant filtering.
+Output data details: Filtered VCF files, SNP density, Fst, Tajima's D.  
+Run variant filtering and analysis pipeline starting with a raw VCF file and producing population genetic metrics from a filtered VCF.
 
 **Session 4**  
 Topics: Statistical Considerations  
@@ -42,14 +43,14 @@ Instructor: Dr. Krishna Veeramah  (Stony Brook University)
 Info:
 
 **Session 8**  
-Topics:  Data Management and Visualization  
+Topics:  Data Management in R 
 Instructor: Dr. Ellen Quillen (Wake Forest University)  
 Info: Basics of manipulating data in Tidy R, Tidyverse, Bioconductor, etc.  
 
 **Session 9**  
-Topics:  Data Management and Visualization  
+Topics:  Data Visualization in R   
 Instructor: Dr. Genevieve Housman (University of Chicago)  
-Info: Basics of Visualizing data in R and ggplot2 
+Info: Basics of Visualizing Data in R using ggplot2 and Gviz 
 
 
    

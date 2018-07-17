@@ -51,7 +51,7 @@ mgenos&lt;-rawgenos for(n in 1:ncol(mgenos)){ mgenos\[,n\]&lt;-as.numeric(mgenos
 ```
 ### Compute the Composite Linkage Disequilibrium Score
 
-The commented out line will likely not work with a larger date set due to lack of RAM.
+The commented out line will likely not work with a larger dataset due to lack of RAM.
 
 However, I am including it for illustration purposes as its the first thing many think of
 

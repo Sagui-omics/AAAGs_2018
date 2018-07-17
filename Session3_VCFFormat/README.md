@@ -160,8 +160,7 @@ mkdir filtered_vcf
 ## The -R flag corresponts to the reference fgenome file, the -V file refers to the input VCF
 ## which we generated in the past session, the -O flag is the output file and the --select flag 
 ## indicates we only want SNPs.
-java -jar //anaconda/envs/agar2018/share/gatk4-4.0.5.2-0/gatk-package-4.0.5.2-local.jar \
- SelectVariants \
+gatk --java-options "-Xmx1g" SelectVariants \
  -R reference/human_v37_MT.fasta  \
  -V genotyped_vcfs/human_v37_MT.gatk.called.raw.vcf.gz	\
  -O filtered_vcf/human_v37_MT.gatk.called.raw_snps.vcf \
@@ -172,7 +171,7 @@ java -jar //anaconda/envs/agar2018/share/gatk4-4.0.5.2-0/gatk-package-4.0.5.2-lo
 #### Most flags are the same as above.
 #### The filter-expression lists all five comands divided by the || = OR statement.
 #### The filter-name provides a name for the list of filters specified above.
-java -jar //anaconda/envs/agar2018/share/gatk4-4.0.5.2-0/gatk-package-4.0.5.2-local.jar VariantFiltration \
+gatk --java-options "-Xmx1g"  VariantFiltration \
 -R reference/human_v37_MT.fasta  \
 -V filtered_vcf/human_v37_MT.gatk.called.raw_snps.vcf \
 --filter-expression "QD < 2.0 || FS > 60.0 || MQ < 40.0 || MQRankSum < -12.5 || ReadPosRankSum < -8.0" \
@@ -206,8 +205,7 @@ Using the GATK recommended parameters, only two variants failed to pass the thre
 ```
 ## Using SelectVariants 
 ## Note use of --selectExpressions and --invertSelect flags
-java -jar //anaconda/envs/agar2018/share/gatk4-4.0.5.2-0/gatk-package-4.0.5.2-local.jar \
- SelectVariants \
+gatk --java-options "-Xmx1g" SelectVariants \
  -R reference/human_v37_MT.fasta  \
  -V filtered_vcf/human_v37_MT.gatk.called.raw_snps.vcf	\
  -O filtered_vcf/human_v37_MT.gatk.called.hfilt_snps.selvar.vcf \
@@ -240,22 +238,19 @@ If you get stuck, check out one approach below:&nbsp;
 ## Using GATK Select Variants:
 
 ## Using GATK tools
-java -jar //anaconda/envs/agar2018/share/gatk4-4.0.5.2-0/gatk-package-4.0.5.2-local.jar \
- SelectVariants \
+gatk --java-options "-Xmx1g" SelectVariants \
  -R reference/human_v37_MT.fasta  \
  -V filtered_vcf/human_v37_MT.gatk.called.raw_snps.vcf	\
  -O filtered_vcf/human_v37_MT.gatk.called.hfiltDP_snps.selvar.vcf \
  --selectExpressions "DP >500"
 
-java -jar //anaconda/envs/agar2018/share/gatk4-4.0.5.2-0/gatk-package-4.0.5.2-local.jar \
- SelectVariants \
+gatk --java-options "-Xmx1g" SelectVariants \
  -R reference/human_v37_MT.fasta  \
  -V filtered_vcf/human_v37_MT.gatk.called.raw_snps.vcf	\
  -O filtered_vcf/human_v37_MT.gatk.called.hfiltQD_snps.selvar.vcf \
  --selectExpressions "QD > 30.0" 
 
-java -jar //anaconda/envs/agar2018/share/gatk4-4.0.5.2-0/gatk-package-4.0.5.2-local.jar \
- SelectVariants \
+gatk --java-options "-Xmx1g" SelectVariants \
  -R reference/human_v37_MT.fasta  \
  -V filtered_vcf/human_v37_MT.gatk.called.raw_snps.vcf	\
  -O filtered_vcf/human_v37_MT.gatk.called.hfiltDPQD_snps.selvar.vcf \
@@ -268,10 +263,13 @@ grep -vc "#" filtered_vcf/human_v37_MT.gatk.called.hfiltDPQD_snps.selvar.vcf
 ```
 &nbsp;
  
-If you were performing your own variant filtering, what thresholds would you use? Which parameters are important for your research projects? One way to determine which thresholds are best for you is to visualize how the data looks before and after filtering. We can run a quick R script to plot a few of the VCF quality tags including read depth (DP), QUAL scores and mapping quality (MQ). In the next session you will go more in depth into how to write scripts for plotting i R but for now we will run a pre-made script using as input our pre-filtered and post-filtered SNPs only VCFs. The plots will be output as pdf. Many thanks to Genevieve Housman for writing this by the way!s
+If you were performing your own variant filtering, what thresholds would you use? Which parameters are important for your research projects? One way to determine which thresholds are best for you is to visualize how the data looks before and after filtering. We can run a quick R script to plot a few of the VCF quality tags including read depth (DP), QUAL scores and mapping quality (MQ). In the next session you will go more in depth into how to write scripts for plotting i R but for now we will run a pre-made script using as input our pre-filtered and post-filtered SNPs only VCFs. The plots will be output as pdf. Many thanks to Genevieve Housman for writing the script by the way!
 ```
 ## Make a sub-directory to store the plots in
 mkdir filtered_vcf/QCplots
+
+## Install the necessary R libraries (more on this later in session 4)
+conda install r-vcfr
 
 ## Before filtering with GATK best practices thresholds. 
 Rscript vcf_plots.R filtered_vcf/human_v37_MT.gatk.called.raw_snps.vcf prefilter
