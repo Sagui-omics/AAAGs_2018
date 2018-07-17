@@ -1,0 +1,1087 @@
+---
+title: "Data Visualization in R"
+author: "Genevieve Housman"
+date: "August 3 , 2018"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+This session will teach you how to visualize your data in R. Plots are useful for explorating and communicating your data to others. The R packages that we will focus on are ggplot2 and Gviz. First, we will review the basics of these packages. Following this, we will use these tools to visualize the VCF data that were produced earlier in the workshop.
+
+```{r load libraries, include=FALSE, message=FALSE, warning=FALSE}
+
+library(BSgenome.Hsapiens.UCSC.hg19)
+library(GenomicFeatures)
+library(GenomicRanges)
+library(ggdendro)
+library(ggplot2)
+library(gplots)
+library(grid)
+library(gridExtra)
+library(gtable)
+library(Gviz)
+library(RColorBrewer)
+library(reshape2)
+library(RMariaDB)
+library(rtracklayer)
+library(scales)
+library(tidyverse)
+library(TxDb.Hsapiens.UCSC.hg19.knownGene)
+library(vcfR)
+library(viridisLite)
+
+```
+
+
+## Basics of ggplot2
+
+```{r ggplot2 setup}
+
+#load libraries
+library(tidyverse)
+library(scales)
+library(reshape2)
+library(ggdendro)
+library(grid)
+library(RColorBrewer)
+library(gplots)
+
+#set working directory (if necessary)
+#getwd()
+#setwd("G:/My Drive/Documents/AAAG/data-viz-session")
+
+#load data
+sample.details <- read.table(file = "./example-data/example_sample_info.txt", header = TRUE)
+prop.reads <- read.table(file = "./example-data/example_read_mapping_summary.txt", header=TRUE)
+gene.counts <- read.table(file = "./example-data/example_gene_counts.txt", header=TRUE)
+
+#visualize data
+head(sample.details)
+head(prop.reads)
+head(gene.counts)
+
+```
+
+```{r ggplot2 scatter plots}
+
+#scatter plots - pca, sample info
+
+#perform pca
+pca_genes <- prcomp(t(gene.counts), scale = F)
+scores <- as.data.frame(pca_genes$x)
+scores$Samples = rownames(scores)
+scores <- merge(scores, sample.details, by.x="Samples", by.y="Samples")
+
+#visualize data
+head(scores)
+
+#empty plot
+ggplot(data = scores)
+
+#plot basic pca
+ggplot(data = scores) +
+  geom_point(mapping = aes(x = PC1, y = PC2))
+
+#change aesthetics
+ggplot(data = scores) +
+  geom_point(mapping = aes(x = PC1, y = PC2, color = Species))
+ggplot(data = scores) +
+  geom_point(mapping = aes(x = PC1, y = PC2, size = Species))
+ggplot(data = scores) +
+  geom_point(mapping = aes(x = PC1, y = PC2, alpha = Species))
+ggplot(data = scores) +
+  geom_point(mapping = aes(x = PC1, y = PC2, shape = Species))
+ggplot(data = scores) +
+  geom_point(mapping = aes(x = PC1, y = PC2, color = "blue"))
+ggplot(data = scores) +
+  geom_point(mapping = aes(x = PC1, y = PC2), color = "blue")
+
+#add facet wrappings
+ggplot(data = scores) +
+  geom_point(mapping = aes(x = PC1, y = PC2)) +
+  facet_wrap(~ Species, nrow = 2)
+ggplot(data = scores) +
+  geom_point(mapping = aes(x = PC1, y = PC2)) +
+  facet_wrap(~ TimePoint)
+ggplot(data = scores) +
+  geom_point(mapping = aes(x = PC1, y = PC2)) +
+  facet_grid(Species ~ TimePoint)
+
+#plot fancy pca
+ggplot(data = scores) +
+  geom_point(mapping = aes(x = PC1, y = PC2, color = as.factor(TimePoint), shape = Species), size = 5) +
+  ggtitle("PCA of Raw Gene Count Data") +
+  xlab(paste("PC1: ", round(summary(pca_genes)$importance[2,1],3)*100, "% variance explained", sep="")) +
+  ylab(paste("PC2: ", round(summary(pca_genes)$importance[2,2],3)*100, "% variance explained", sep=""))
+
+#other scatter plots, smooth plots, and aesthetics
+ggplot(data = scores) +
+  geom_point(mapping = aes(x = TimePoint, y = CellViability))
+ggplot(data = scores) +
+  geom_smooth(mapping = aes(x = TimePoint, y = CellViability))
+ggplot(data = scores) +
+  geom_point(mapping = aes(x = TimePoint, y = CellViability, color = Species))
+ggplot(data = scores) +
+  geom_smooth(mapping = aes(x = TimePoint, y = CellViability, linetype = Species))
+ggplot(data = scores) +
+  geom_smooth(mapping = aes(x = TimePoint, y = CellViability, group = Species))
+ggplot(data = scores) +
+  geom_smooth(mapping = aes(x = TimePoint, y = CellViability, color = Species), show.legend = FALSE)
+ggplot(data = scores) +
+  geom_point(mapping = aes(x = TimePoint, y = CellViability)) +
+  facet_wrap(~ Species, nrow = 2)
+ggplot(data = scores) +
+  geom_smooth(mapping = aes(x = TimePoint, y = CellViability)) +
+  facet_wrap(~ Species, nrow = 2)
+
+#plot multiple geoms simultaneously
+ggplot(data = scores) + 
+  geom_point(mapping = aes(x = TimePoint, y = CellViability)) +
+  geom_smooth(mapping = aes(x = TimePoint, y = CellViability))
+ggplot(data = scores, mapping = aes(x = TimePoint, y = CellViability)) +
+  geom_point() +
+  geom_smooth()
+ggplot(data = scores, mapping = aes(x = TimePoint, y = CellViability)) +
+  geom_point(mapping = aes(color = Species)) +
+  geom_smooth()
+ggplot(data = scores, mapping = aes(x = TimePoint, y = CellViability)) + 
+  geom_point(mapping = aes(color = Species)) + 
+  geom_smooth(mapping = aes(color = Species))
+ggplot(data = scores, mapping = aes(x = TimePoint, y = CellViability)) + 
+  geom_point(mapping = aes(color = Species)) + 
+  geom_smooth(data = filter(scores, Species == "human"), mapping = aes(color = Species))
+
+```
+
+```{r ggplot2 bar plots}
+
+#bar plot - mapped reads
+
+#merge data for easy use
+prop.reads <- merge(prop.reads, sample.details, by.x="Samples", by.y="Samples")
+head(prop.reads)
+
+#plot the total number of samples grouped by species (shows count because the default stat is stat_count())
+ggplot(data = prop.reads) +
+  geom_bar(mapping = aes(x = Species))
+ggplot(data = prop.reads) +
+  geom_bar(mapping = aes(x = Species), stat = "count")
+ggplot(data = prop.reads) +
+  stat_count(mapping = aes(x = Species))
+
+#plot the total number of mapped reads per sample (change stat to identity to plot the default value provided in y)
+ggplot(data = prop.reads) +
+  geom_bar(mapping = aes(x = Samples, y = NumMapped), stat = "identity")
+
+#plot the total number of mapped reads per sample and color by species
+ggplot(data = prop.reads) +
+  geom_bar(mapping = aes(x = Samples, y = NumMapped, color = Species), stat = "identity")
+ggplot(data = prop.reads) +
+  geom_bar(mapping = aes(x = Samples, y = NumMapped, fill = Species), stat = "identity")
+#Exercise: try changing the fill to different variables (instead of Species, try TimePoint)
+
+#rotate bar plot
+ggplot(data = prop.reads) +
+  geom_bar(mapping = aes(x = Samples, y = NumMapped, fill = Species), stat = "identity") +
+  coord_flip()
+ggplot(data = prop.reads) +
+  geom_bar(mapping = aes(x = Samples, y = NumMapped, fill = Species), stat = "identity") +
+  coord_polar()
+
+#plot stacks of factors within bars
+ggplot(data = prop.reads) +
+  geom_bar(mapping = aes(x = as.factor(TimePoint), y = NumMapped, fill = Species), stat = "identity")
+ggplot(data = prop.reads) +
+  geom_bar(mapping = aes(x = as.factor(TimePoint), y = NumMapped, fill = Species), stat = "identity",
+           position = "identity")
+ggplot(data = prop.reads) +
+  geom_bar(mapping = aes(x = as.factor(TimePoint), y = NumMapped, fill = Species), stat = "identity",
+           position = "identity", alpha = 1/5)
+ggplot(data = prop.reads) +
+  geom_bar(mapping = aes(x = as.factor(TimePoint), y = NumMapped, color = Species), stat = "identity",
+           position = "identity", fill = NA)
+ggplot(data = prop.reads) +
+  geom_bar(mapping = aes(x = as.factor(TimePoint), y = NumMapped, fill = Species), stat = "identity",
+           position = "fill")
+ggplot(data = prop.reads) +
+  geom_bar(mapping = aes(x = as.factor(TimePoint), y = NumMapped, fill = Species), stat = "identity",
+           position = "dodge")
+
+#plot the total number of mapped reads per sample with extra details (requires scales package)
+ggplot(data = prop.reads) +
+  geom_bar(mapping = aes(x = Samples, y = NumMapped, fill = Species), stat = "identity", color= "black") +
+  ggtitle("Mapped Reads for All Samples") +
+  ylab("Number of Mapped Reads") +
+  xlab("Samples") +
+  geom_hline(yintercept=10000000) +
+  theme(axis.text.x=element_text(angle=90, hjust=1)) +
+  scale_y_continuous(labels=comma)
+#Exercise: try other formatting changes to this figure
+#Exercies: try plotting the number of total reads and unmapped reads per sample
+
+```
+
+```{r ggplot2 histograms}
+
+#histogram - gene counts
+
+#visualize data
+summary(gene.counts$H0)
+
+#plot histogram of gene count values in sample H0
+ggplot(data = gene.counts, mapping = aes(x = H0)) +
+        geom_histogram()
+
+#modify bin number and size
+ggplot(data = gene.counts, mapping = aes(x = H0)) +
+        geom_histogram(bins = 10)
+ggplot(data = gene.counts, mapping = aes(x = H0)) +
+        geom_histogram(binwidth = 500)
+
+#plot fancy histogram
+ggplot(data = gene.counts, mapping = aes(x = H0)) +
+       geom_histogram(binwidth = 5000, fill = "blue", color = "black") +
+       labs(title = "Histogram of Gene Counts in H0", y = "Frequency", x = "Gene Counts") +
+       theme_bw()
+
+```
+
+```{r ggplot2 boxplots}
+
+#boxplot - mapped reads
+
+#plot the total number of mapped reads per sample as a boxplot
+ggplot(data = prop.reads) +
+  geom_boxplot(mapping = aes(x = Species, y = NumMapped))
+
+#plot the total number of mapped reads per time point
+ggplot(data = prop.reads) +
+  geom_boxplot(mapping = aes(x = as.factor(TimePoint), y = NumMapped))
+ggplot(data = prop.reads) +
+  geom_boxplot(mapping = aes(x = as.factor(TimePoint), y = NumMapped)) +
+  labs(title = "Mapped Reads for All Samples", y = "Number of Mapped Reads", x = "Time Points")
+ggplot(data = prop.reads) +
+  geom_boxplot(mapping = aes(x = as.factor(TimePoint), y = NumMapped, fill = as.factor(TimePoint))) +
+  labs(title = "Mapped Reads for All Samples", y = "Number of Mapped Reads", x = "Time Points") +
+  guides(fill=guide_legend(title="Time Points"))
+
+```
+
+```{r ggplot2 heatmaps}
+
+#heatmaps - gene count correlations
+#no specific heatmap plotting function but can combine geom_tile with smooth gradient fill
+
+#calculate spearman correlation matrix of gene counts among samples 
+cors <- cor(gene.counts, method="spearman", use="pairwise.complete.obs")
+head(cors)
+
+#melt correlation data to reformat data (requires reshape2 package)
+cors.melt <- melt(cors)
+head(cors.melt)
+
+#plot heatmap of gene count correlations
+ggplot(data = cors.melt) +
+  geom_tile(mapping = aes(x=Var1, y=Var2, fill=value))
+
+#adjust the gradient fill colors
+ggplot(data = cors.melt) +
+  geom_tile(mapping = aes(x=Var1, y=Var2, fill=value), color = "white") +
+  scale_fill_gradient(low = "white", high = "steelblue")
+
+#plot half of the correlation matrix
+#step 1: define function to get lower triangle of the correlation matrix
+get_lower_tri <- function(cormat){
+  cormat[upper.tri(cormat)] <- NA
+  return(cormat)
+}
+#step 2: reformate data to just color half of correlation matrix
+half.cors <- get_lower_tri(cors)
+head(half.cors)
+half.cors.melt <- melt(half.cors, na.rm=TRUE)
+head(half.cors.melt)
+#step 3: plot reformated data
+ggplot(data = half.cors.melt) +
+  geom_tile(mapping = aes(x=Var1, y=Var2, fill=value), colour = "white") +
+  scale_fill_gradient(low = "white", high = "steelblue")
+
+#plot fancier heatmap
+ggplot(data = half.cors.melt) +
+  geom_tile(mapping = aes(x=Var1, y=Var2, fill=value), colour = "white") +
+  scale_fill_gradient(low = "white", high = "steelblue", name = "Spearman\nCorrelation", guide = guide_legend()) +
+  guides(fill = guide_legend(title.vjust = 0.1)) +
+  theme_minimal()
+
+#incorporate dendrogram displaying how samples cluster based on correlation matrix with heatmap plot
+#step 1: create dendrogram (requires ggdendro package)
+cors.dendro <- as.dendrogram(hclust(d = dist(x = cors)))
+dendro.plot <- ggdendrogram(data = cors.dendro, rotate = TRUE)
+dendro.plot
+#step 2: create heatmap
+heatmap.plot <- ggplot(data = half.cors.melt) +
+  geom_tile(mapping = aes(x=Var1, y=Var2, fill=value), color = "white") +
+  scale_fill_gradient(low = "white", high = "steelblue", name = "Spearman\nCorrelation", guide = guide_legend()) +
+  guides(fill = guide_legend(title.vjust = 0.1)) +
+  theme_minimal()
+heatmap.plot
+#step 3: combine heatmap with dendrogram (requires grid package)
+grid.newpage()
+print(heatmap.plot, vp = viewport(x = 0.4, y = 0.5, width = 0.8, height = 1.0))
+print(dendro.plot, vp = viewport(x = 0.90, y = 0.445, width = 0.2, height = 1.0))
+
+#BUT WAIT - dendrogram and heatmap orders are different, legend is in a weird place, and plots are not aligned
+
+#step 4: make dendrogram and heatmap orders match
+#function to reorder correlation matrix according to the correlation coefficient (same as dendrogram order)
+reorder_cormat <- function(cormat){
+  dd <- as.dist((1-cormat)/2)
+  hc <- hclust(dd)
+  cormat <-cormat[hc$order, hc$order]
+}
+#reorder correlation matrix
+order.cors <- reorder_cormat(cors)
+head(order.cors)
+half.order.cors <- get_lower_tri(order.cors)
+head(half.order.cors)
+half.order.cors.melt <- melt(half.order.cors, na.rm=TRUE)
+head(half.order.cors.melt)
+#remake heatmap and total plot
+heatmap.plot <- ggplot(data = half.order.cors.melt) +
+  geom_tile(mapping = aes(x=Var1, y=Var2, fill=value), color = "white") +
+  scale_fill_gradient(low = "white", high = "steelblue", name = "Spearman\nCorrelation", guide = guide_legend()) +
+  guides(fill = guide_legend(title.vjust = 0.1)) +
+  theme_minimal()
+grid.newpage()
+print(heatmap.plot, vp = viewport(x = 0.4, y = 0.5, width = 0.8, height = 1.0))
+print(dendro.plot, vp = viewport(x = 0.90, y = 0.445, width = 0.2, height = 1.0))
+
+#step 5: reposition legend
+heatmap.plot <- ggplot(data = half.order.cors.melt) +
+  geom_tile(mapping = aes(x=Var1, y=Var2, fill=value), color = "white") +
+  scale_fill_gradient(low = "white", high = "steelblue", name = "Spearman\nCorrelation") +
+  theme_minimal() +
+  theme(legend.position = "top")
+grid.newpage()
+print(heatmap.plot, vp = viewport(x = 0.4, y = 0.5, width = 0.8, height = 1.0))
+print(dendro.plot, vp = viewport(x = 0.90, y = 0.445, width = 0.2, height = 1.0))
+
+#step 6: align plots
+#remove heatmap y axis labels and align dendrogram tips with heatmap rows
+heatmap.plot <- ggplot(data = half.order.cors.melt) +
+  geom_tile(mapping = aes(x=Var1, y=Var2, fill=value), color = "white") +
+  scale_fill_gradient(low = "white", high = "steelblue", name = "Spearman\nCorrelation") +
+  theme_minimal() +
+  theme(axis.text.y = element_blank(),
+        axis.title.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        legend.position = "top")
+grid.newpage()
+print(heatmap.plot, vp = viewport(x = 0.4, y = 0.5, width = 0.8, height = 1.0))
+print(dendro.plot, vp = viewport(x = 0.90, y = 0.43, width = 0.2, height = 0.77))
+#the actual values used in viewport will depend on the graphics device used
+
+#alternative way to make heatmaps with dendrograms (requires RColorBrewer and gplots packages)
+colors <- colorRampPalette(c(brewer.pal(9, "Blues")[1],brewer.pal(9, "Blues")[9]))(100)
+pal <- c(brewer.pal(9, "Set1"), brewer.pal(8, "Set2"), brewer.pal(12, "Set3"))
+heatmap.2(cors, distfun=dist, hclustfun=hclust, dendrogram="both",
+          scale="none", trace='none', col=colors, denscol="white", 
+          ColSideColors=pal[as.integer(as.factor(sample.details$Species))],
+          RowSideColors=pal[as.integer(as.factor(sample.details$TimePoint))+9])
+
+```
+
+```{r ggplot2 additional info}
+
+#saving data
+
+#option 1
+ggplot(data = scores) +
+  geom_point(mapping = aes(x = PC1, y = PC2, color = Species))
+ggsave(filename = "PCA-plot1.png", path = "./", width = 10, height = 7)
+
+png(filename = "./PCA-plot2.png", width = 10, height = 7, units = "in", res = 300)
+ggplot(data = scores) +
+  geom_point(mapping = aes(x = PC1, y = PC2, color = Species))
+dev.off()
+
+```
+
+
+## Basics of Gviz
+
+```{r Gviz setup}
+
+#load libraries
+library(Gviz)
+library(rtracklayer)
+library(TxDb.Hsapiens.UCSC.hg19.knownGene)
+library(BSgenome.Hsapiens.UCSC.hg19)
+library(GenomicRanges)
+library(GenomicFeatures)
+library(RMariaDB)
+
+#load data
+gtf <- import("./example-data/example_gene_counts_ranges_short.gtf")
+txdb <- TxDb.Hsapiens.UCSC.hg19.knownGene
+
+#visualize and manipulate data
+gtf
+gtf <- gtf[,5:10]
+gtf
+
+```
+
+```{r Gviz example session}
+
+#example of a typical Gviz session
+iTrack <- IdeogramTrack(genome = "hg19", chromosome = "chr18")
+xTrack <- GenomeAxisTrack()
+gTrack <- GeneRegionTrack(txdb, chromosome = "chr18")
+sTrack <- SequenceTrack(Hsapiens, chromosome = "chr18")
+dTrack <- DataTrack(gtf[seqnames(gtf) == "chr18"], name = "gene count data")
+plotTracks(list(iTrack, xTrack, gTrack, sTrack, dTrack))
+
+#adjust the zoom
+plotTracks(list(iTrack, xTrack, gTrack, sTrack, dTrack), from = 2500000, to = 5000000)
+plotTracks(list(iTrack, xTrack, gTrack, sTrack, dTrack), from = 3240000, to = 3280000)
+plotTracks(list(iTrack, xTrack, gTrack, sTrack, dTrack), from = 3269900, to = 3270200)
+plotTracks(list(iTrack, xTrack, gTrack, sTrack, dTrack), from = 3270050, to = 3270150)
+plotTracks(list(iTrack, xTrack, gTrack, sTrack, dTrack), from = 3270080, to = 3270110)
+plotTracks(list(iTrack, xTrack, gTrack, sTrack, dTrack))
+plotTracks(list(iTrack, xTrack, gTrack, sTrack, dTrack), extend.left = 0.25, extend.right = 1e+07)
+#float values between -1 and 1 interpreted as zoom factor
+
+#setting parameters
+#option 1: during object instantiation
+gTrack <- GeneRegionTrack(txdb, chromosome = "chr18", name = "Gene Model",
+                          transcriptAnnotation = "transcript", background.title = "brown")
+head(displayPars(gTrack))
+plotTracks(list(iTrack, xTrack, gTrack, sTrack, dTrack), from = 3240000, to = 3280000)
+#option 2: using displayPar replacement method
+displayPars(gTrack) <- list(background.panel = "#FFFEDB", col = NULL)
+head(displayPars(gTrack))
+plotTracks(list(iTrack, xTrack, gTrack, sTrack, dTrack), from = 3240000, to = 3280000)
+#option 3: during plotting operation
+plotTracks(list(iTrack, xTrack, gTrack, sTrack, dTrack), from = 3240000, to = 3280000,
+           background.panel = "#FFFEDB", background.title = "darkblue")
+
+#plot data on reverse strand
+plotTracks(list(iTrack, xTrack, gTrack, sTrack, dTrack), from = 3240000, to = 3280000, reverseStrand = TRUE)
+
+```
+
+```{r Gviz ideogram track}
+
+#ideogram track
+iTrack <- IdeogramTrack(genome = "hg19", chromosome = "chr1")
+plotTracks(iTrack, from = 1.5e+08, to = 2.17e+08)
+
+#remove chromosome name
+plotTracks(iTrack, from = 1.5e+08, to = 2.17e+08, showId = FALSE)
+
+#display chromosome band identifiers
+plotTracks(iTrack, from = 1.5e+08, to = 2.17e+08, showId = FALSE, showBandId = TRUE, cex.bands = 0.5)
+
+```
+
+```{r Gviz genome axis track}
+
+#genome axis track
+xTrack <- GenomeAxisTrack()
+plotTracks(xTrack, from = 1.5e+08, to = 2.17e+08)
+
+#highlight specific portions of axis track
+xTrack <- GenomeAxisTrack(range = IRanges(start = c(1.6e+08, 1.9e+08), end = c(1.7e+08, 2.0e+08),
+                                          names = rep("N-stretch", + 2)))
+plotTracks(xTrack, from = 1.5e+08, to = 2.17e+08)
+
+#provide names to specific regions
+plotTracks(xTrack, from = 1.5e+08, to = 2.17e+08, showId = TRUE)
+
+#add directional indicators
+plotTracks(xTrack, from = 1.5e+08, to = 2.17e+08, add53 = TRUE)
+
+#adjust resolution
+plotTracks(xTrack, from = 1.5e+08, to = 2.17e+08, add53 = TRUE, littleTicks = TRUE)
+
+#adjust label positions
+plotTracks(xTrack, from = 1.5e+08, to = 2.17e+08, labelPos = "below")
+
+#simplify axis
+plotTracks(xTrack, from = 1.5e+08, to = 2.17e+08, scale = 0.5)
+plotTracks(xTrack, from = 1.5e+08, to = 2.17e+08, scale = 0.5, labelPos = "above")
+
+```
+
+```{r Gviz sequence track}
+
+#sequence track
+#(requires BSgenome.Hsapiens.UCSC.hg19 package)
+sTrack <- SequenceTrack(Hsapiens, chromosome = "chr1")
+sTrack
+plotTracks(sTrack, from = 1.5e08, to = 150000050)
+
+#change font colors
+fcol <- c(A = "black", C = "black", T = "black", G = "black")
+plotTracks(sTrack, from = 1.5e08, to = 150000050, fontcolor = fcol)
+
+#add directional indicators
+plotTracks(sTrack, from = 1.5e08, to = 150000050, add53 = TRUE)
+
+#show complement sequence
+plotTracks(sTrack, from = 1.5e08, to = 150000050, add53 = TRUE, complement = TRUE)
+
+#nucleotides change their display as the scale changes
+plotTracks(sTrack, from = 1.5e08, to = 150000050)
+plotTracks(sTrack, from = 1.5e08, to = 150000100)
+plotTracks(sTrack, from = 1.5e08, to = 150000100, cex = 0.4)
+plotTracks(sTrack, from = 1.5e08, to = 2.17e+08)
+
+```
+
+```{r Gviz data track}
+
+#data track
+dTrack <- DataTrack(gtf)
+plotTracks(dTrack, chromosome = "chr1", from = 1.5e08, to = 1.51e+08)
+
+#change y-axis name
+dTrack <- DataTrack(gtf, name = "Gene Count")
+plotTracks(dTrack, chromosome = "chr1", from = 1.5e08, to = 1.51e+08)
+
+#plot data as different types
+
+#dot plot
+plotTracks(dTrack, chromosome = "chr1", from = 1.5e08, to = 1.51e+08, type = "p")
+#lines plot
+plotTracks(dTrack, chromosome = "chr1", from = 1.5e08, to = 1.51e+08, type = "l")
+#dot and lines plot
+plotTracks(dTrack, chromosome = "chr1", from = 1.5e08, to = 1.51e+08, type = "b")
+#lines plot of average values
+plotTracks(dTrack, chromosome = "chr1", from = 1.5e08, to = 1.51e+08, type = "a")
+#stair steps (horizontal first)
+plotTracks(dTrack, chromosome = "chr1", from = 1.5e08, to = 1.51e+08, type = "s")
+#stair steps (vertical first)
+plotTracks(dTrack, chromosome = "chr1", from = 1.5e08, to = 1.51e+08, type = "S")
+#add grid lines
+plotTracks(dTrack, chromosome = "chr1", from = 1.5e08, to = 1.51e+08, type = "g")
+#add linear regression line
+plotTracks(dTrack, chromosome = "chr1", from = 1.5e08, to = 1.51e+08, type = "r")
+#histogram lines
+plotTracks(dTrack, chromosome = "chr1", from = 1.5e08, to = 1.51e+08, type = "h")
+#confidence intervals for average values
+plotTracks(dTrack, chromosome = "chr1", from = 1.5e08, to = 1.51e+08, type = "confint")
+#add loess curve
+plotTracks(dTrack, chromosome = "chr1", from = 1.5e08, to = 1.51e+08, type = "smooth")
+#histogram (bar width equal to range with)
+plotTracks(dTrack, chromosome = "chr1", from = 1.5e08, to = 1.51e+08, type = "histogram")
+#mountain-type plot relative to a baseline
+plotTracks(dTrack, chromosome = "chr1", from = 1.5e08, to = 1.51e+08, type = "mountain")
+#polygon-type plot relative to a baseline
+plotTracks(dTrack, chromosome = "chr1", from = 1.5e08, to = 1.51e+08, type = "polygon")
+#box and whisker plot
+plotTracks(dTrack, chromosome = "chr1", from = 1.5e08, to = 1.51e+08, type = "boxplot")
+#false color image of summarized values
+plotTracks(dTrack, chromosome = "chr1", from = 1.5e08, to = 1.51e+08, type = "gradient")
+#false color image of individual values
+plotTracks(dTrack, chromosome = "chr1", from = 1.5e08, to = 1.51e+08, type = "heatmap")
+#shows magnitude and direction of change relative to a baseline
+plotTracks(dTrack, chromosome = "chr1", from = 1.5e08, to = 1.51e+08, type = "horizon")
+#these types can also be specified in DataTrack() function
+
+#plot data as multiple types simultaneously
+plotTracks(dTrack, chromosome = "chr1", from = 1.5e08, to = 1.51e+08, type = c("a", "p", "confint"))
+
+#provide sample information
+colnames(mcols(gtf))
+plotTracks(dTrack, chromosome = "chr1", from = 1.5e08, to = 1.51e+08, type = c("heatmap"),
+           showSampleNames = TRUE, cex.sampleNames = 0.6)
+
+#group data
+dTrack <- DataTrack(gtf, name = "Gene Count", groups = rep(c("human", "chimp"), each = 3))
+plotTracks(dTrack, chromosome = "chr1", from = 1.5e08, to = 1.51e+08, type = c("a", "p", "confint"))
+#other plots that work well for grouped data
+plotTracks(dTrack, chromosome = "chr1", from = 1.5e08, to = 1.51e+08, type = "p")
+plotTracks(dTrack, chromosome = "chr1", from = 1.5e08, to = 1.51e+08, type = "l")
+plotTracks(dTrack, chromosome = "chr1", from = 1.5e08, to = 1.51e+08, type = "b")
+plotTracks(dTrack, chromosome = "chr1", from = 1.5e08, to = 1.51e+08, type = "a")
+plotTracks(dTrack, chromosome = "chr1", from = 1.5e08, to = 1.51e+08, type = "s")
+plotTracks(dTrack, chromosome = "chr1", from = 1.5e08, to = 1.51e+08, type = "S")
+plotTracks(dTrack, chromosome = "chr1", from = 1.5e08, to = 1.51e+08, type = "r")
+plotTracks(dTrack, chromosome = "chr1", from = 1.5e08, to = 1.51e+08, type = "h")
+plotTracks(dTrack, chromosome = "chr1", from = 1.5e08, to = 1.51e+08, type = "confint")
+plotTracks(dTrack, chromosome = "chr1", from = 1.5e08, to = 1.51e+08, type = "smooth")
+plotTracks(dTrack, chromosome = "chr1", from = 1.5e08, to = 1.51e+08, type = "histogram")
+plotTracks(dTrack, chromosome = "chr1", from = 1.5e08, to = 1.51e+08, type = "boxplot") #hard to see at this scale
+plotTracks(dTrack, chromosome = "chr1", from = 1.5e08, to = 1.51e+08, type = "heatmap")
+#horizon plots are a little different
+dTrack <- DataTrack(gtf, name = "Gene Count", groups = colnames(mcols(gtf)))
+plotTracks(dTrack, chromosome = "chr1", from = 1.5e08, to = 1.51e+08, type = "horizon",
+           showSampleNames = TRUE, cex.sampleNames = 0.6)
+
+#remove legend
+dTrack <- DataTrack(gtf, name = "Gene Count", groups = rep(c("human", "chimp"), each = 3))
+plotTracks(dTrack, chromosome = "chr1", from = 1.5e08, to = 1.51e+08, type = c("a", "p"), legend = FALSE)
+
+#example of plotting alignment coverage from bam file (reference data track)
+bamFile <- system.file("extdata/test.bam", package = "Gviz")
+bamTrack <- DataTrack(range = bamFile, genome = "hg19", type = "l", name = "Coverage", window = -1, chromosome = "chr1")
+class(bamTrack)
+bamTrack
+plotTracks(bamTrack, from = 189990000, to = 1.9e+08)
+
+```
+
+```{r Gviz annotation track}
+
+#annotation track
+AnnotationTrack()
+
+#option 1: construct from individual arguments
+st <- c(150100000, 150300000, 150500000, 150700000)
+ed <- c(150150000, 150450000, 150600000, 150750000)
+str <- c("-", "+", "-", "-")
+gr <- c("Group1","Group2","Group1", "Group3")
+annoTrack <- AnnotationTrack(start = st, end = ed, strand = str, genome = "hg19", chromosome = "chr1",
+                             feature = "test", group = gr, id = paste("annTrack item", 1:4),
+                             name = "generic annotation", stacking = "squish")
+plotTracks(annoTrack, from = 1.5e08, to = 1.51e+08)
+
+#option 2: construct from data.frame
+df <- data.frame(start=st, end=ed, strand=str, id=paste0("reg",1:4), feature="test", group=gr)
+annoTrack <- AnnotationTrack(range = df, genome = "hg19", chromosome = "chr1",
+                             name = "generic annotation", stacking = "squish")
+plotTracks(annoTrack, from = 1.5e08, to = 1.51e+08)
+
+#option 3: construct from GRanges object (or GRangesList)
+gr <- GRanges(seqnames = "chr1", range = IRanges(start = df$start, end = df$end), strand = str)
+genome(gr) <- "hg19"
+mcols(gr) <- df[,-(1:3)]
+annoTrack <- AnnotationTrack(range = gr, name = "generic annotation", stacking = "squish")
+plotTracks(annoTrack, from = 1.5e08, to = 1.51e+08)
+plotTracks(list(annoTrack, dTrack), from = 1.5e08, to = 1.51e+08)
+
+#adjust range item shape and lables
+plotTracks(annoTrack, shape = "box", featureAnnotation = "id")
+plotTracks(annoTrack, shape = "ellipse", featureAnnotation = "feature", fontcolor.feature = "darkblue")
+plotTracks(annoTrack, groupAnnotation = "group", just.group = "right")
+plotTracks(annoTrack, groupAnnotation = "group", just.group = "above")
+
+#adjust density of annotation features that overlap
+plotTracks(annoTrack, stacking = "dense")
+
+#example of how changes in color saturation improves visualization of dense data
+data("denseAnnTrack")
+plotTracks(denseAnnTrack, showOverplotting = TRUE)
+
+#example of building an annoation track from files (reference annotaion track)
+bamFile <- system.file("extdata/test.bam", package = "Gviz")
+bamTrack <- AnnotationTrack(range = bamFile, genome = "hg19", name = "Reads", chromosome = "chr1")
+class(bamTrack)
+bamTrack
+plotTracks(bamTrack, from = 189995000, to = 1.9e+08)
+
+```
+
+```{r Gviz gene region track}
+
+#gene region track
+txdb <- TxDb.Hsapiens.UCSC.hg19.knownGene
+gTrack <- GeneRegionTrack(txdb, chromosome = "chr1")
+head(gene(gTrack))
+head(transcript(gTrack))
+head(exon(gTrack))
+head(symbol(gTrack))
+plotTracks(gTrack,from = 1.5e08, to = 1.51e+08)
+
+#adjust displayed information
+plotTracks(gTrack, from = 1.5e08, to = 1.51e+08, transcriptAnnotation = "gene")
+plotTracks(gTrack, from = 1.5e08, to = 1.51e+08, transcriptAnnotation = "transcript")
+
+#collapse gene models from individual exons and transcripts down to logest transcripts
+plotTracks(gTrack, from = 1.5e08, to = 1.51e+08, transcriptAnnotation = "gene",
+           collapseTranscripts = "longest", shape = "arrow")
+
+```
+
+```{r Gviz biomart gene region track}
+
+#biomart gene region track (variatio of gene region track)
+biomTrack <- BiomartGeneRegionTrack(genome = "hg19", chromosome = "chr1", start = 1.5e08, end = 1.51e+08,
+                                    name = "ENSEMBL")
+plotTracks(biomTrack, from = 1.5e08, to = 1.51e+08)
+
+#remove automatic color coding imported from biomart
+plotTracks(biomTrack, from = 1.5e08, to = 1.51e+08, col.line = NULL, col = NULL)
+
+#adjust stack height
+plotTracks(biomTrack, from = 1.5e08, to = 1.51e+08, stackHeight = 0.3)
+
+#add gene symbole info
+plotTracks(biomTrack, from = 1.5e08, to = 1.51e+08, stackHeight = 0.3, transcriptAnnotation = "symbol")
+
+#collapse gene models from individual exons and transcripts down to gene bodies
+plotTracks(biomTrack, from = 1.5e08, to = 1.51e+08, stackHeight = 0.3, transcriptAnnotation = "symbol",
+           collapseTranscripts = TRUE, shape = "arrow")
+
+```
+
+```{r Gviz ucsc track}
+
+#ucsc track (variatio of gene region track)
+
+#ucsc genes
+knownGenes <- UcscTrack(genome = "hg19", chromosome = "chr1", from = 1.5e08, to = 1.51e08,
+                        track = "knownGene", trackType = "GeneRegionTrack",
+                        rstarts = "exonStarts", rends = "exonEnds", gene = "name",
+                        symbol = "name", transcript = "name", strand = "strand",
+                        fill = "#8282d2", name = "UCSC Genes")
+#refseq genes
+refGenes <- UcscTrack(genome = "hg19", chromosome = "chr1", from = 1.5e08, to = 1.51e08,
+                        track = "xenoRefGene", trackType = "GeneRegionTrack",
+                        rstarts = "exonStarts", rends = "exonEnds", gene = "name",
+                        symbol = "name2", transcript = "name", strand = "strand",
+                        fill = "#8282d2", stacking = "dense", name = "UOther RefSeq")
+#ensemble genes
+ensGenes <- UcscTrack(genome = "hg19", chromosome = "chr1", from = 1.5e08, to = 1.51e08,
+                      track = "ensGene", trackType = "GeneRegionTrack",
+                      rstarts = "exonStarts", rends = "exonEnds", gene = "name",
+                      symbol = "name2", transcript = "name", strand = "strand",
+                      fill = "#960000", name = "Ensembl Genes")
+#cpg islands
+cpgIslands <- UcscTrack(genome = "hg19", chromosome = "chr1", from = 1.5e08, to = 1.51e08,
+                        track = "cpgIslandExt", trackType = "AnnotationTrack",
+                        start = "chromStart", end = "chromEnd", id = "name",
+                        shape = "box", fill = "#006400", name = "CpG Islands")
+#snps
+snpLocations <- UcscTrack(genome = "hg19", chromosome = "chr1", from = 1.5e08, to = 1.51e08,
+                          track = "HapMap SNPs", trackType = "AnnotationTrack", table = "hapmapSnpsCEU",
+                          start = "chromStart", end = "chromEnd", id = "name",
+                          feature = "func", strand = "strand",
+                          shape = "box", stacking = "dense", fill = "black", name = "SNPs")
+#plot ucsc tracks
+xTrack <- GenomeAxisTrack()
+iTrack <- IdeogramTrack(genome = "hg19", chromosome = "chr1")
+plotTracks(list(iTrack, xTrack, knownGenes, refGenes, ensGenes, cpgIslands, snpLocations),
+           from = 1.5e08, to = 1.51e+08, showTitle = FALSE)
+
+```
+
+```{r Gviz highlighting tracks}
+
+#highlighting
+ht <- HighlightTrack(trackList = list(xTrack, gTrack, dTrack), chromosome = "chr1",
+                     start = c(150500000, 150700000), width = c(7000,150000))
+plotTracks(list(iTrack, ht), from = 1.5e08, to = 1.51e08)
+
+#build multiple hight tracks
+ht1 <- HighlightTrack(trackList = list(iTrack, xTrack, gTrack), chromosome = "chr1",
+                      start = c(150500000, 150700000), width = c(7000,150000))
+ht2 <- HighlightTrack(trackList = dTrack, chromosome = "chr1",
+                      start = c(150510000, 150710000), width = c(7000,150000))
+plotTracks(list(ht1, ht2), from = 1.5e08, to = 1.51e08)
+
+```
+
+
+## Applying ggplot2 and Gviz to VCF Data
+
+```{r vcf data plots}
+
+#load libraries
+library(vcfR)
+
+#load data
+vcf <- read.vcfR(file = "./vcf-data/human_v37_MT.gatk.called.filt_snps.vcf", verbose = TRUE)
+
+#visualize data
+vcf
+head(vcf)
+
+#create chromR object
+chrom <- create.chromR(vcf, name = "CHROM", seq = NULL, ann = NULL,  verbose = TRUE)
+chrom <- proc.chromR(chrom)
+chrom
+head(chrom)
+
+#extract read depth info
+dp <- extract.gt(chrom, element="DP", as.numeric=TRUE)
+head(dp)
+
+
+
+### USING BASIC PLOTS ###
+
+#histograms of data summaries
+plot(chrom)
+
+#scatter plots and bar plot of data summaries
+chromoqc(chrom)
+
+#boxplot of read depth per sample 
+boxplot(dp, las=3, col=c("#C0C0C0", "#808080"), ylab="Depth", las=2)
+
+#heatmap plot of read depth of each snp in all samples
+heatmap.bp(dp)
+
+
+
+### USING GGPLOTS ###
+
+library(ggplot2)
+library(grid)
+library(gridExtra)
+library(reshape2)
+library(viridisLite)
+
+##histograms of data summaries
+
+#data manipulation
+dp <- chrom@var.info[,c(2,4)]
+mq <- chrom@var.info[,c(2,3)]
+gq <- data.frame(POS = chrom@var.info[,2], QUAL = getQUAL(chrom))
+vc <- chrom@win.info[,c(2,7)]
+#make plots
+p1 <- ggplot(data = dp, mapping = aes(x = DP)) +
+        geom_histogram(binwidth = 50, center = 425, fill = "green3", color = "black") +
+        xlim(c(400,900)) +
+        labs(title = "Read Depth (DP)", y = "Frequency", x = NULL) + theme_bw()
+p2 <- ggplot(data = mq, mapping = aes(x = MQ)) +
+        geom_histogram(binwidth = 1, center = 59.5, fill = "blue3", color = "black") +
+        xlim(c(59,66)) +
+        labs(title = "Mapping Quality (MQ)", y = "Frequency", x = NULL) + theme_bw()
+p3 <- ggplot(data = gq, mapping = aes(x = QUAL)) +
+        geom_histogram(binwidth = 5000, center = 2500, fill = "cyan", color = "black") +
+        xlim(c(0,40000)) +
+        labs(title = "Quality (QUAL)", y = "Frequency", x = NULL) + theme_bw()
+p4 <- ggplot(data = vc, mapping = aes(x = variants/1000)) +
+        geom_histogram(binwidth = 0.005, center = 0.0075, fill = "maroon1", color = "black") +
+        xlim(c(0,0.035)) +
+        labs(title = "Variant Count (per window)", y = "Frequency", x = NULL) + theme_bw()
+grid.arrange(grobs = list(p1, p2, p3, p4), nrow = 2)
+
+
+##scatter plots and bar plot of data summaries
+
+#data manipulation
+dp <- chrom@var.info[,c(2,4)]
+mq <- chrom@var.info[,c(2,3)]
+gq <- data.frame(POS = chrom@var.info[,2], QUAL = getQUAL(chrom))
+vc <- chrom@win.info[,c(4,7)]
+#make plots
+p1a <- ggplot(data = dp, mapping = aes(x = POS, y = DP)) + 
+         geom_point(color = "dodgerblue3") +
+         xlim(c(0,17000)) +
+         ylim(c(0,900)) +
+         labs(title = "Read Depth (DP)", y = NULL, x = NULL) +
+         theme_bw() + theme(plot.title = element_text(hjust = 0.5, vjust = -7, size = 10, face = "bold"),
+                            axis.text.x = element_blank())
+p1b <- ggplot(data = dp, mapping = aes(y = DP)) +
+         geom_boxplot(fill = "dodgerblue3") +
+         ylim(c(0,900)) +
+         labs(title = NULL, y = NULL, x = NULL) +
+         theme_bw() + theme(axis.text.x = element_blank(),
+                            axis.text.y = element_blank())
+p2a <- ggplot(data = mq, mapping = aes(x = POS, y = MQ)) + 
+         geom_point(color = "green4") +
+         xlim(c(0,17000)) +
+         ylim(c(0,70)) +
+         labs(title = "Mapping Quality (MQ)", y = NULL, x = NULL) +
+         theme_bw() + theme(plot.title = element_text(hjust = 0.5, vjust = -7, size = 10, face = "bold"),
+                            axis.text.x = element_blank())
+p2b <- ggplot(data = mq, mapping = aes(y = MQ)) +
+         geom_boxplot(fill = "green4") +
+         ylim(c(0,70)) +
+         labs(title = NULL, y = NULL, x = NULL) +
+         theme_bw() + theme(axis.text.x = element_blank(),
+                            axis.text.y = element_blank())
+p3a <- ggplot(data = gq, mapping = aes(x = POS, y = QUAL)) + 
+         geom_point(color = "magenta4") +
+         xlim(c(0,17000)) +
+         ylim(c(0,40000)) +
+         labs(title = "Phred-Scaled Quality (QUAL)", y = NULL, x = NULL) +
+         theme_bw() + theme(plot.title = element_text(hjust = 0.5, vjust = -7, size = 10, face = "bold"),
+                            axis.text.x = element_blank())
+p3b <- ggplot(data = gq, mapping = aes(y = QUAL)) +
+         geom_boxplot(fill = "magenta4") +
+         ylim(c(0,40000)) +
+         labs(title = NULL, y = NULL, x = NULL) +
+         theme_bw() + theme(axis.text.x = element_blank(),
+                            axis.text.y = element_blank())
+p4a <- ggplot(data = vc, mapping = aes(x = end-500, y = variants/1000)) +
+         geom_bar(stat = "identity", fill = "red3") +
+         xlim(c(0,17000)) +
+         ylim(c(0,0.15)) +
+         labs(title = "Variants per Site", y = NULL, x = "Base Pairs") +
+         theme_bw() + theme(plot.title = element_text(hjust = 0.5, vjust = -7, size = 10, face = "bold"))
+p4b <- ggplot(data = vc, mapping = aes(y = variants/1000)) +
+         geom_boxplot(fill = "red3") +
+         ylim(c(0,0.15)) +
+         labs(title = NULL, y = NULL, x = NULL) +
+         theme_bw() + theme(axis.text.x = element_blank(),
+                            axis.text.y = element_blank())
+g1a <- ggplotGrob(p1a)
+g1b <- ggplotGrob(p1b)
+g1b$heights <- unit.pmax(g1a$heights, g1b$heights)
+g2a <- ggplotGrob(p2a)
+g2b <- ggplotGrob(p2b)
+g2b$heights <- unit.pmax(g2a$heights, g2b$heights)
+g3a <- ggplotGrob(p3a)
+g3b <- ggplotGrob(p3b)
+g3b$heights <- unit.pmax(g3a$heights, g3b$heights)
+g4a <- ggplotGrob(p4a)
+g4b <- ggplotGrob(p4b)
+g4b$heights <- unit.pmax(g4a$heights, g4b$heights)
+g1a$widths <- unit.pmax(g1a$widths, g2a$widths, g3a$widths, g4a$widths)
+g2a$widths <- unit.pmax(g1a$widths, g2a$widths, g3a$widths, g4a$widths)
+g3a$widths <- unit.pmax(g1a$widths, g2a$widths, g3a$widths, g4a$widths)
+g4a$widths <- unit.pmax(g1a$widths, g2a$widths, g3a$widths, g4a$widths)
+grid.arrange(grobs = list(g1a, g1b, g2a, g2b, g3a, g3b, g4a, g4b),
+             widths = c(6, 1), nrow = 4, top = "CHROM")
+
+
+##boxplot of read depth per sample
+
+#data manipulation
+dp <- extract.gt(chrom, element="DP", as.numeric=TRUE)
+dp <- as.data.frame(melt(dp))
+#make plot
+ggplot(data = dp) +
+  geom_boxplot(mapping = aes(x = Var2, y = value), fill = rep(c("#C0C0C0", "#808080"), 9)) +
+  labs(title = "Boxplot of Genotype Read Depths per Sample", y = "Genotype Read Depths", x = NULL) +
+  theme_bw() + theme(axis.text.x = element_text(angle = 90, hjust = 1))
+  
+
+##heatmap plot of read depth of each snp in all samples
+
+#data manipulation
+dp <- extract.gt(chrom, element="DP", as.numeric=TRUE)
+dp <- as.data.frame(melt(dp))
+#make plot
+ggplot(data = dp) +
+  geom_tile(mapping = aes(x=Var2, y=Var1, fill=value)) +
+  scale_fill_gradientn(colors = viridis(n = 100, alpha = 1), name = "Read\nDepth", guide = guide_legend()) +
+  scale_y_discrete(position = "right") + 
+  scale_x_discrete(position = "top") +
+  labs(y = "Genotypes", x = NULL) +
+  theme(axis.text.x = element_text(angle=90, hjust=1),
+        axis.text.y = element_text(size = 5))
+
+```
+
+```{r fst data plots}
+
+#load data (Fst per site)
+CEUvYRI <- read.table(file = "./vcf-data/CEUvYRI.fstpersite.weir.fst", header = TRUE)
+PURvCEU <- read.table(file = "./vcf-data/PURvCEU.fstpersite.weir.fst", header = TRUE)
+PURvYRI <- read.table(file = "./vcf-data/PURvYRI.fstpersite.weir.fst", header = TRUE)
+
+#visualize data
+head(CEUvYRI)
+head(PURvCEU)
+head(PURvYRI)
+
+
+
+### USING GGPLOTS ###
+
+library(ggplot2)
+library(grid)
+library(gtable)
+
+#plot Fst per site
+p1 <- ggplot(data = CEUvYRI) +
+        geom_point(mapping = aes(x = POS, y = WEIR_AND_COCKERHAM_FST), size = 1) +
+        ggtitle("Fst per Site: CEU vs. YRI") +
+        xlab("Position on Mitochondrial Genome") +
+        ylab("Fst") +
+        xlim(0,16569) +
+        theme_bw()
+p2 <- ggplot(data = PURvCEU) +
+        geom_point(mapping = aes(x = POS, y = WEIR_AND_COCKERHAM_FST), size = 1) +
+        ggtitle("Fst per Site: PUR vs. CEU") +
+        xlab("Position on Mitochondrial Genome") +
+        ylab("Fst") +
+        xlim(0,16569) +
+        theme_bw()
+p3 <- ggplot(data = PURvYRI) +
+        geom_point(mapping = aes(x = POS, y = WEIR_AND_COCKERHAM_FST), size = 1) +
+        ggtitle("Fst per Site: PUR vs. YRI") +
+        xlab("Position on Mitochondrial Genome") +
+        ylab("Fst") +
+        xlim(0,16569) +
+        theme_bw()
+g1 <- ggplotGrob(p1)
+g2 <- ggplotGrob(p2)
+g3 <- ggplotGrob(p3)
+g <- rbind(g1, g2, g3, size = "first")
+g$widths <- unit.pmax(g1$widths, g2$widths, g3$widths)
+grid.newpage()
+grid.draw(g)
+
+
+
+### USING GVIZ ###
+
+library(Gviz)
+library(GenomicRanges)
+library(BSgenome.Hsapiens.UCSC.hg19)
+
+#data manipulation
+gr <- GRanges(seqnames = "chrM", strand = rep("*", length(CEUvYRI$CHROM)),
+              ranges = IRanges(start = CEUvYRI$POS, width = 1))
+values(gr) <- DataFrame(CEUvYRI = CEUvYRI$WEIR_AND_COCKERHAM_FST,
+                        PURvCEU = PURvCEU$WEIR_AND_COCKERHAM_FST,
+                        PURvYRI = PURvYRI$WEIR_AND_COCKERHAM_FST)
+#make plots
+iTrack <- IdeogramTrack(genome = "hg19", chromosome = "chrM")
+xTrack <- GenomeAxisTrack(labelPos = "above")
+sTrack <- SequenceTrack(Hsapiens, chromosome = "chrM", add53 = TRUE)
+ensGenes <- UcscTrack(genome = "hg19", chromosome = "chrM",
+                      track = "ensGene", trackType = "GeneRegionTrack",
+                      rstarts = "exonStarts", rends = "exonEnds", gene = "name",
+                      symbol = "name2", transcript = "name", strand = "strand",
+                      fill = "#960000", name = "Ensembl Genes")
+snpLocations <- UcscTrack(genome = "hg19", chromosome = "chrM",
+                          track = "HapMap SNPs", trackType = "AnnotationTrack", table = "hapmapSnpsCEU",
+                          start = "chromStart", end = "chromEnd", id = "name",
+                          feature = "func", strand = "strand",
+                          shape = "box", stacking = "dense", fill = "black", name = "SNPs")
+#plot all Fst values together
+dTrack <- DataTrack(gr, name = "Fst")
+plotTracks(list(iTrack, xTrack, sTrack, ensGenes, snpLocations, dTrack), background.title = "black")
+#plot Fst values per group
+dTrack <- DataTrack(gr, name = "Fst", groups = c("CEUvYRI", "PURvCEU", "PURvYRI"), type = "p")
+plotTracks(list(iTrack, xTrack, sTrack, ensGenes, snpLocations, dTrack), background.title = "black")
+#plot Fst values for each group on different tracks
+dTrack1 <- DataTrack(gr[colnames(values(gr)) == "CEUvYRI"], name = "CEUvYRI Fst", type = "p")
+dTrack2 <- DataTrack(gr[colnames(values(gr)) == "PURvCEU"], name = "PURvCEU Fst", type = "p")
+dTrack3 <- DataTrack(gr[colnames(values(gr)) == "PURvYRI"], name = "PURvYRI Fst", type = "p")
+plotTracks(list(iTrack, xTrack, sTrack, ensGenes, snpLocations, dTrack1, dTrack2, dTrack3), background.title = "black")
+
+```
+
+## References
+https://ggplot2.tidyverse.org/#learning-ggplot2
+http://r4ds.had.co.nz/data-visualisation.html
+http://r4ds.had.co.nz/graphics-for-communication.html
+https://www.datacamp.com/courses/data-visualization-with-ggplot2-1
+https://www.rstudio.com/wp-content/uploads/2015/03/ggplot2-cheatsheet.pdf
+https://learnr.wordpress.com/2010/01/26/ggplot2-quick-heatmap-plotting/
+http://www.sthda.com/english/wiki/ggplot2-quick-correlation-matrix-heatmap-r-software-and-data-visualization
+https://jcoliver.github.io/learn-r/008-ggplot-dendrograms-and-heatmaps.html
+https://bioconductor.org/packages/devel/bioc/vignettes/Gviz/inst/doc/Gviz.pdf
+http://genomicsclass.github.io/book/pages/visualizing_NGS.html
+https://www.biostars.org/p/18954/
+https://cran.r-project.org/web/packages/egg/vignettes/Ecosystem.html
+https://bioconductor.org/packages/release/bioc/vignettes/ggbio/inst/doc/ggbio.pdf
+http://www.sthda.com/english/wiki/ggbio-visualize-genomic-data
+https://ggvis.rstudio.com/
+https://knausb.github.io/vcfR_documentation/
+https://cran.r-project.org/web/packages/vcfR/vignettes/intro_to_vcfR.html
+Shared scripts from the Gilad lab at UChicago
