@@ -22,7 +22,7 @@ Output data details: Filtered VCF files, SNP density, Fst, Tajima's D.
 Run variant filtering and analysis pipeline starting with a raw VCF file and producing population genetic metrics from a filtered VCF.
 
 **Session 4**  
-Topics: Statistical Considerations  
+Topics: Multiple Testing Correction With Large Datasets  
 Instructor: Christopher Clukay (University of Florida)  
 Info: Basics of multiple testing correction methods and selection  
 Optimize computing time by taking advantage of multiple processors
