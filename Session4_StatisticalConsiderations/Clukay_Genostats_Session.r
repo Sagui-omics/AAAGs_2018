@@ -10,12 +10,12 @@ pheno <- read.table(file="pheno.csv", header = TRUE, sep=",",row.names = 1)
 ########    Part 1: mini-GWAS and Basic Bonferroni Correction                                       ########
 ############################################################################################################
 
-######Package instal######
+######Package install######
 #Answer y when asked whether to install from a source that needs compilation
 install.packages("SNPassoc") 
 library(SNPassoc)
 
-######formate data for SNPassoc (similar to PLINK format)######
+######format data for SNPassoc (similar to PLINK format)######
 geno_pheno<-cbind(pheno,rawgenos)
 org_geno<-setupSNP(geno_pheno, 4:ncol(geno_pheno), sort = TRUE, snpinfo, sep = "")
 
@@ -62,9 +62,9 @@ for(n in 1:ncol(mgenos)){
 
 ######Compute the Composite Linkage Disequilibrium Score######
 
-#The commented out line will likely not work with a larger date set due to lack of RAM.
+#The commented out line will likely not work with a larger dataset due to lack of RAM.
 #However, I am including it for illustration purposes as its the first thing many think of
-#and even the papers above recommend using this function, but dont adress this difficulty.
+#and even the papers above recommend using this function, but don't adress this difficulty.
 
 #compld<-cor(mgenos)
 
@@ -105,7 +105,7 @@ for (v in 1:length(eigns$values)){
 
 print(counter)
 
-#This would then be repeated for each chromosome and you would add the values togerther
+#This would then be repeated for each chromosome and you would add the values together
 #to get the total number of tests to apply Bonferroni correction. Try it with chromosome 1
 #and be sure to inspect the corrlation matrix before removing bad SNPs as there is a trap!
 
@@ -119,7 +119,7 @@ pvaladd<-codominant(miniGWAS)
 #Check if FDR is appropriate
 hist(pvaladd, breaks = 20)
 
-#Since the historam is relatively uniform, by strictest standards we shouldn't be using 
+#Since the histogram is relatively uniform, by strictest standards we shouldn't be using 
 #FDR here, but well keep going for demonstration purposes
 
 qvals<-p.adjust(pvaladd, "fdr")
@@ -189,10 +189,10 @@ sig_snps<-which(permutedpvals < 0.05)
 sig_snpIDs<-colnames(suborg_geno)[sig_snps]
 
 snpinfo[snpinfo$dbSNP.RS.ID %in% sig_snpIDs,] 
-#NOTE: %in% compares to vectors like == compares to a value
+#NOTE: %in% compares something to a vector like == compares to a value
 
 #Permutation gets much more complicated with covariates and you need a lot more planning.
-#If interested in this, look up the 'BiasedUrn' package. 
+#If interested in this, look up the 'BiasedUrn' package and literature related to it. 
 
 ############################################################################################################
 ########    Part 5: Basic Parallel Computing                                                        ########
@@ -205,7 +205,7 @@ ncore<-detectCores()
 cl<-makeCluster(as.numeric(ncore))
 registerDoParallel(cl)
 
-######Define the permutation reshuffles we did as their own function######
+######Define the permutation reshuffles we did as its own function######
 
 permshuffle<-function(genodata, n_sims) {
 
