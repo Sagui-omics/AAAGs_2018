@@ -6,14 +6,6 @@ The MT sequence was extracted with the command:
 samtools faidx human_g1k_v37.fasta MT > human_v37_MT.fasta
 ```
 
-### Commands to index reference
-For our pipeline, you'll need a few index files that can be easily generated with the following three commands:
-```
-samtools faidx reference/human_v37_MT.fasta
+We also downloaded a chimpanzee mitochondrial genome from: https://www.ncbi.nlm.nih.gov/nuccore/262399649/
 
-samtools dict -o reference/human_v37_MT.dict reference/human_v37_MT.fasta
-
-bwa index reference/human_v37_MT.fasta
-```
-
-Note that the index files need to remain in the same directory as the reference.
+We manually renamed the chimpanzee MT genome file after download.

@@ -1,10 +1,10 @@
 ## Creating fastqs
 
-Commands based on tutorial by T. Webster available at https://github.com/thw17/ASU_BIO543_Genome_Assembly_2018/tree/master/fastq
+Files prepared by Maria Nieves Colon. Commands based, in part, on tutorial by T. Webster available at https://github.com/thw17/ASU_BIO543_Genome_Assembly_2018/tree/master/fastq
 
 These fastqs were created by subsetting data from 1000 genomes low coverage bams (Example: NA18501.mapped.ILLUMINA.bwa.YRI.low_coverage.20130415.bam) available from here: ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/phase3/data/
 
-Among three 1000 genomes populations, we randomly selected six individuals/population from CEU, YRI and PUR (N=18). To find the names of the individuals we made a popinfo file and searched it using grep and head:
+We randomly selected six individuals from three 1000 genomes populations: CEU, YRI and PUR (N=18). To find the names of the individuals we made a popinfo file and searched it using grep and head:
 ```
 grep "CEU" 1KGP3.popinfo.txt | head -n6
 NA06984 NA06984 CEU EUR 1
