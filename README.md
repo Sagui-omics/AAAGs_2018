@@ -34,7 +34,7 @@ Optimize computing time by taking advantage of multiple processors
 
 **Session 6**  
 Topics: Molecular genetic and genomic analysis of gene variants  
-Instructor: Drs. Antonio Herrera  (Stony Brook University)  
+Instructor: Dr. Antonio Herrera  (Stony Brook University)  
 Info: Identifying sources of variation and the role of mutation in the evolution of DNA sequence and gene function. Using python, we will explore aspects of molecular genetic and genomic function of identified variants and generate hypotheses about their effect on gene function.  
 
 **Session 7**  
@@ -47,13 +47,7 @@ Topics: Admixture and Genetic Introgression Analysis
 Instructor: Dr. Krishna Veeramah  (Stony Brook University)  
 Info: Applying f and D statistics using the ADMIXTOOLS package to infer population admixture
 
-
 **Session 9**  
 Topics:  Data Visualization in R   
 Instructor: Dr. Genevieve Housman (University of Chicago)  
 Info: Basics of Visualizing Data in R using ggplot2 and Gviz 
-
-
-   
-
-
