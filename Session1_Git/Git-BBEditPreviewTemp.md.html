@@ -1,0 +1,193 @@
+<h1>Introduction to Version Control and Git</h1>
+
+<h1>Joanna Malukiewicz</h1>
+
+<h1>AGAR 2018</h1>
+
+<h2>1. What is Version Control</h2>
+
+<p><img src="phd101212s.png" alt="alt text" title="" /></p>
+
+<p>Version controls refers to a system that lets you track changes to a file or set of files. </p>
+
+<p>Over time, earlier versions of these files are able to be recalled at future time points. </p>
+
+<p>Here this will be a brief introduction to Git and Github for version control. </p>
+
+<p>Every time you save the state of a project, Git takes a snapshot of what all your files look like at that moment and stores that snapshot as a reference.</p>
+
+<p>Git commits (or saved snapshot) allow past versions of saved material to be reproduced and rolled back. With the commit command, Git takes everything we have told it to save by using git add and stores a copy permanently inside the special .git directory. This permanent copy is called a commit (or revision) and its short identifier is f22b25e. Your commit may have another identifier.</p>
+
+<p>Git helps keep track of important changes to code, files , and directories.</p>
+
+<p>Git helps maintain continuity in a project as well as a record of project history.</p>
+
+<p>A repository (or repo) houses the commits of a particular project. Repos can be sync'd across different computers which allows for collaboration among colleagues and even strangers!</p>
+
+<h2>2. Setting up Git after Installation and Getting a Git Repo</h2>
+
+<p>Git config allows for configuration and personalization of Git</p>
+
+
+
+<pre><code>#set identify
+$ git config --global user.name "John Doe"
+$ git config --global user.email johndoe@example.com
+
+#check settings 
+$ git config --list
+</code></pre>
+
+
+
+<p>make directory "my_git_repo" and then change into that directory </p>
+
+
+
+<pre><code>$ mkdir my_git_repo
+$ cd my_git_repo
+$ git init
+</code></pre>
+
+
+
+<p>The git init command forms a git repo skeleton 
+Then there are commands to start version tracking </p>
+
+
+
+<pre><code>$ nano README.txt
+$ git add README.txt
+$ git commit -m 'initial project version'
+$ ls -a
+$ git status
+</code></pre>
+
+
+
+<p>The git add commands starts tracking a new file. </p>
+
+<p>ls -a will list all hidden and unhidden directory and files including the hidden .git sub-directory which contains the repo's history. </p>
+
+<p>it is also placed into the "staging area," or waiting area of updated, modified, newly tracked, etc files prior to "committing" these modifications to Git. </p>
+
+<p>The git status command lets you check the state of these various factors within the repo. </p>
+
+<p>the git commit command creates a snapshot for Git that will go into the history of updates for these files. </p>
+
+<p>the -m flag allows you to add an informative message for the commit you are making. Using a text editor is an alternative to using the -m flag.</p>
+
+<p>NB: If you modify a file after you run git add, you have to run git add again to stage the latest version of the file.</p>
+
+<p>To stop tracking a file under Git, use the git rm command does. </p>
+
+<p>However, this command  also removes the file from your working directory.</p>
+
+<p>Another option would be to stop tracking the file but let it stay in the directory. </p>
+
+<p>For that use the command "git rm --cached".</p>
+
+
+
+<pre><code>$ git rm --cached README.txt
+$ git status 
+$ git add README.txt 
+$ git commit -m "add back README"
+</code></pre>
+
+
+
+<p>With the commit command, Git will store everything saved by git add permanently inside the  .git sub-directory. This permanent copy is what we mean by a commit. </p>
+
+<p>Re-open your file, add in new text, and see if you can make the next commit on your own. Issue a git status command, add the modified file, issue another status command. </p>
+
+<p>Issue a git diff command. What happens? </p>
+
+<p>Then continue with the commit, and status commands. Did you succeed?  </p>
+
+<h2>3. Intro to Remote Repositories</h2>
+
+<p>Git allows work to be moved between two repositories. Github allows one of those repositories to be located centrally on the web and another copy on a laptop.</p>
+
+<p>After creating a GitHub account (which you all should have done), I initialized a new repo for the workshop on Github's end. You can click "initialize this repository with a README" for a "quick set-up."
+<img src="Github_repo_make.jpg" alt="alt text" title="" /></p>
+
+<p>Next you will set up a local version of the repo on your computer, of which you will create a local "clone." This can be done implicitly with the git clone command. </p>
+
+
+
+<pre><code>$ git clone https://github.com:Sagui-omics/AAAGs_2018.git
+$ git remote -v
+</code></pre>
+
+
+
+<p>The git remote command lists your current remote repositories.</p>
+
+<p>"Origin" is a local (and highly common) nickname for your remote repository. It is also the default name Git gives to servers from which you cloned a repo. </p>
+
+<p>You do have the option to use something else when you set up a remote repo with git remote add <shortname> <url>. This step can be done explicitly with the following steps. </p>
+
+
+
+<pre><code>$ git remote add not_a_clone https://github.com:Sagui-omics/AAAGs_2018.git
+$ git remote -v
+</code></pre>
+
+
+
+<p>Then use the git fetch command to retrieve all the info that is on the other repository but that is not yet in your repository. </p>
+
+
+
+<pre><code>git fetch not_a_clone
+</code></pre>
+
+
+
+<p>Afterward, git fetch origin will retrieve  any new work that has been pushed to that server from which you last cloned or fetched.</p>
+
+<p>Additionally commands of which to be aware: </p>
+
+
+
+<pre><code>$git pull origin master
+</code></pre>
+
+
+
+<p>git pull fetches data from the server you originally cloned from and automatically tries to merge it into the code you’re currently working on.</p>
+
+
+
+<pre><code>$ git push origin master
+</code></pre>
+
+
+
+<p>Once you have added and committed your files and are ready to deposit them to the online centralized repository, you will use the </p>
+
+<p>git push command. </p>
+
+<h2>4. (Really Short) Intro to Git Branching</h2>
+
+<p><img src="Branching.png" alt="alt text" title="" /></p>
+
+<p>In Git, the default branch where your main line of commits is maintained the master branch. </p>
+
+<p>If you want to try out something different before incorporating it into the master branch, you can create a new branch. </p>
+
+<p>Depending on what branch you'd like to work on, you will "checkout" that branch in git. </p>
+
+<p>Once you are happy with your changes, you can merge the side branch to your main branch. </p>
+
+<p>The branch that you are currently working on is referred to as the "Head" in Git.  </p>
+
+<h2>Resources and References for This Presentation</h2>
+
+<p>https://swcarpentry.github.io/git-novice/
+Greg Wilson: "Software Carpentry: Getting Scientists to Write Better
+Code by Making Them More Productive".  Computing in Science &amp;
+Engineering, Nov-Dec 2006.</p>
+
+<p>ProGit book (available free online)</p>
