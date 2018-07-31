@@ -166,5 +166,7 @@ Engineering, Nov-Dec 2006.
 
 ProGit book (available free online)
 
+https://git-scm.com/book/en/v2
+
 
 
