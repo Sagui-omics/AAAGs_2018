@@ -3,15 +3,13 @@ title: "Data Visualization in R"
 author: "Genevieve Housman"
 date: "August 3 , 2018"
 output: html_document
-editor_options: 
-  chunk_output_type: console
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-This session will teach you how to visualize your data in R. Plots are useful for explorating and communicating your data to others. The R packages that we will focus on are ggplot2 and Gviz. First, we will review the basics of these packages. Following this, we will use these tools to visualize the VCF data that were produced earlier in the workshop.
+This session will teach you how to visualize your data in R. Plots are useful for exploring and communicating your data to others. The R packages that we will focus on are ggplot2 and Gviz. First, we will review the basics of these packages. Following this, we will use these tools to visualize the VCF data that were produced earlier in the workshop.
 
 ```{r load libraries, include=FALSE, message=FALSE, warning=FALSE}
 
@@ -404,6 +402,7 @@ ggplot(data = scores) +
   geom_point(mapping = aes(x = PC1, y = PC2, color = Species))
 ggsave(filename = "PCA-plot1.png", path = "./", width = 10, height = 7)
 
+#option 2
 png(filename = "./PCA-plot2.png", width = 10, height = 7, units = "in", res = 300)
 ggplot(data = scores) +
   geom_point(mapping = aes(x = PC1, y = PC2, color = Species))
