@@ -158,6 +158,8 @@ The branch that you are currently working on is referred to as the "Head" in Git
 
 ## Resources and References for This Presentation 
 https://swcarpentry.github.io/git-novice/
+
+
 Greg Wilson: "Software Carpentry: Getting Scientists to Write Better
 Code by Making Them More Productive".  Computing in Science &
 Engineering, Nov-Dec 2006.
