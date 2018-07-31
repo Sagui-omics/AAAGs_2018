@@ -25,20 +25,24 @@ This session features a hands on introduction to the basics of read mapping, BAM
 
 ## Reference-based vs. *de novo* assembly
 
+**Objectives: Understand the difference between reference-based and *de novo* assembly**
+
 There are, in general, two main flavors of genome assembly. *De novo* assembly involves taking raw sequencing reads and piecing them together into a genome assembly using only the information contained in the reads and their metadata (e.g., the sequences themselves, insert sizes, etc.). While a number of de novo assemblers exist and there's a great deal of work being done to improve algorithms, lengthen sequencing reads, develop methods to increase insert sizes, etc., *de novo* assembly remains challenging, expensive (usually 100x or greater sequencing depth), and computationally demanding.
 
 Fortunately, if we have a reference genome available to us, we can make do with much less sequencing (often 30x coverage or less; low coverage - 1-5x - is not uncommon for some purposes), and use tools that require far less memory and storage. We can do this by mapping our sequencing reads to said reference genome.
 
-You can think of the two strategies as different ways of putting together a 30 million piece, highly repetitive jigsaw puzzle (assuming a 3 billion base pair genome and 100 base pair sequencing reads) with parts of many pieces clipped off (sequencing errors) . In this analogy, *de novo* assembly is like mixing 100 or more of those puzzles together in a bag and then trying to put the puzzle together upside down. On the other hand, reference-guided assembly would be like mixing somewhere between 1 and 30 of these puzzles together and then putting the puzzle together picture up on top of a full-sized picture of what the puzzle is supposed to look like. Hopefully, from this analogy it should be clear that reference-guided assembly is much easier, provided your reference is close to what you're assembling and of good quality.
+You can think of the two strategies as different ways of putting together a 30 million piece, highly repetitive jigsaw puzzle (assuming a 3 billion base pair genome and 100 base pair sequencing reads) with parts of many pieces clipped off (sequencing errors). In this analogy, *de novo* assembly is like mixing 100 or more of those puzzles together in a bag and then trying to put the puzzle together upside down. On the other hand, reference-guided assembly would be like mixing somewhere between 1 and 30 of these puzzles together and then putting the puzzle together picture up on top of a full-sized picture of what the puzzle is supposed to look like. Hopefully, from this analogy it should be clear that reference-guided assembly is much easier, provided your reference is close to what you're assembling and of good quality.
 
 In this tutorial, we'll walk through the basics of reference-guided genome assembly. While the dataset we're working with is tiny (we're using the human mitochondrial genome and a tiny subset of reads from the 1000 genomes project), you should be able to use this as a starting point for working with larger datasets down the road.
 
-**Further questions for thought/discussion**
+**Questions for further thought/discussion**
 1. When would we choose *de novo* assembly instead of reference-guided assembly?
 
 2. In the case of reference-guided assembly, what are the pros and cons of higher and lower sequencing coverage?
 
 ## Brief discussion of reproducibility and version control
+
+**Objectives: Understand motivation behind reproducibility and options for designing reproducible pipelines**
 
 The fields of genomics and bioinformatics have typically embraced open source data and code, and reproducibility. While not all analyses are reproducible, these (and more) fields are continuing to move in this direction, with more and more journals requiring data and code to be shared.
 
@@ -46,7 +50,7 @@ With that in mind, it's important that any bioinformatic pipeline we put togethe
 
 #### Conda and Bioconda
 
-[Anaconda (conda)](https://conda.io/docs/) is an environment and package manager for the programming language Python and it makes installation, environment management, etc. simple without requiring root or administrator privileges. Fortunately, its framework has been leveraged to manage a variety of other languages and programs, including for a project called Bioconda that extends these capabilities to external bioinformatic programs as well. You can find out more in the [Bioconda documentation](https://bioconda.github.io/), the [Bioconda paper](https://www.nature.com/articles/s41592-018-0046-7), and the [Conda documentation](https://conda.io/docs/). We'll use Conda and Bioconda to create a controlled environment in which we can manage software specific to this pipeline. When we're done, we can use Conda to print the contents of this environment (every piece of software installed, plus its version and source) so we can share it. In general, **I recommend creating a new Conda environment for every project.**
+[Anaconda (conda)](https://conda.io/docs/) is an environment and package manager for the programming language Python and it makes installation, environment management, etc. simple without requiring root or administrator privileges. Fortunately, its framework has been leveraged to manage a variety of other languages and programs, including for a project called Bioconda that extends these capabilities to external bioinformatic programs as well. You can find out more in the [Bioconda documentation](https://bioconda.github.io/), the [Bioconda paper](https://www.nature.com/articles/s41592-018-0046-7), and the [Conda documentation](https://conda.io/docs/). We'll use Conda and Bioconda to create a controlled environment in which we can manage software specific to this pipeline. When we're done, we can use Conda to print the contents of this environment (every piece of software installed, plus its version and source; [details here](https://conda.io/docs/user-guide/tasks/manage-environments.html#sharing-an-environment)) so we can share it. In general, **I recommend creating a new Conda environment for every project.**
 
 #### Snakemake
 
@@ -142,12 +146,14 @@ which will just print what Snakemake is planning to do, without actually running
 
 That's it for our Snakemake crash course for today. Obviously, we haven't begun to scratch the surface of Snakemake's capabilities or built an understanding of how it works. For this, I highly, highly recommend checking out the Snakemake [tutorial](https://snakemake.readthedocs.io/en/stable/tutorial/tutorial.html) and [documentation](https://snakemake.readthedocs.io/en/stable/).
 
-** Further questions for though/discussion **
+**Questions for further though/discussion**
 1. What are benefits of reproducibility for you and the community?
 
 2. Why is it important to set up a new Conda environment for each project?
 
 ## Setting up
+
+**Objectives: Clone git repository for this tutorial and use Conda to set up software environment for our pipeline**
 
 For today's tutorial, you'll need this repository and Conda.
 
@@ -162,16 +168,16 @@ We'll use ```git``` to clone the repository (repo) for this tutorial onto your c
 Once git is installed, move to the directory on your computer or cluster where you'd like to work and type the command:
 
 ```
-$ git clone https://github.com/thw17/AGAR_2018_Intro_Genome_Assembly
+$ git clone https://github.com/Sagui-omics/AAAGs_2018
 ```
-This should create a directory called AGAR_2018_Intro_Genome_Assembly containing all of the contents of this repo.
+This should create a directory called AAAGs_2018 containing all of the workshop's materials.
 
-Alternatively, if git isn't working for you, you can directly download the zipped directory via the green "Clone or download" button on [the repository's website](https://github.com/thw17/AGAR_2018_Intro_Genome_Assembly).
+Alternatively, if git isn't working for you, you can directly download the zipped directory via the green "Clone or download" button on [the repository's website](https://github.com/Sagui-omics/AAAGs_2018).
 
-Be sure to move to this directory for all subsequent commands:
+Now we need to change into our directory for this tutorial (all subsequent commands assume you're starting from here):
 
 ```
-$ cd AGAR_2018_Intro_Genome_Assembly
+$ cd AAAGs_2018/Session2_ReadAlignment_VariantCalling
 ```
 
 #### Setting up Anaconda
@@ -223,6 +229,8 @@ For example, if we also want to take a look at ``Bowtie2``, another read mapper 
 
 ## Reference genomes and the FASTA format
 
+**Objectives: Understand the FASTA format**
+
 Because we're using a reference-guided assembly approach in this tutorial, we need a reference genome to which we're going to map reads. In a perfect world, this assembly is of a high-quality, has a good set of annotations available (e.g., genes, functional elements, repeats, etc.), and is relatively closely related to the species that you're studying.  There are, for example, numerous reference genomes hosted at the [UCSC Genome Browser](http://hgdownload.soe.ucsc.edu/downloads.html) and [Ensembl](http://www.ensembl.org/info/data/ftp/index.html).  Accessing a reference genome probably won't be a problem if you're working with a model organism, but in other situations you'll have to consider whether a good assembly is available for a taxon evolutionarily close enough for your purposes (if not, you might need to think about assembling a reference for your project _de novo_).  For today, we're working with example sequencing reads from human samples and we have the human reference genome available, so we'll be fine.
 
 FASTA format is a file format designed for DNA or protein sequences.  It looks something like (the first 10 lines of the ``` human_v37_MT.fasta``` file in the ```references``` directory:
@@ -252,6 +260,8 @@ MT	16569
 We see that we do indeed have a single sequence called "MT" that's 16,569 bases in length.
 
 ## Sequencing reads and the FASTQ format
+
+**Objectives: Understand the FASTQ format**
 
 There are a few types of sequencing technologies out there, but Illumina is still dominant, so that's what we'll focus on today.  We won't get into the nuts and bolts of sequencing itself (there are plenty of resources available online that describe it well like [this video](https://www.youtube.com/watch?v=fCd6B5HRaZ8) or [this review](http://www.nature.com/nrg/journal/v17/n6/abs/nrg.2016.49.html)).
 
@@ -297,7 +307,8 @@ example_files/example_read2.fastq.gz
 
 As you can see, there are four reads in each file. This is an example of a "for loop" in BASH.  The ```echo``` command is simply printing each file name and then the ```bioawk``` command counts and prints the total number of records in each file.
 
-We can also count the number of reads from tile 1101 in ```example_files/example_read1.fastq.gz```:
+We can also count the number of reads from tile 1101 in ``example_files/example_read1.fastq.gz``:
+
 ```
 $ bioawk -c fastx '{print $name}' example_files/example_read1.fastq.gz | grep ':1101:' | wc -l
 
@@ -315,12 +326,12 @@ $ bioawk -c fastx '{print $name}' example_files/example_read1.fastq.gz | cut -d'
 
 In both cases, we see that all four reads come from the same tile. This is because I grabbed the first four reads from much larger files, and coming out of the sequencer, reads are sorted by tile.
 
-** Further questions for thought/discussion **
+**Questions for further thought/discussion**
 1. Why are quality scores encoded as ASCII characters?
 
 2. Bioinformatic programs generally require paired-end reads to be two files (forward read file and reverse read file), and to have reads in the two files sorted in the same order. Why is this organization important?
 
-3. Can you tell what sequencing strategy and data type is included in a raw fastq file (e.g. DNA, RNA, whole genome, exome, RADseq, etc.)?
+3. Can you tell what sequencing strategy and data type are included in a raw FASTQ file (e.g. DNA, RNA, whole genome, exome, RADseq, etc.)?
 
 ## Building our pipeline
 
@@ -363,10 +374,17 @@ all_samples = ceu + pur + yri
 assemblies = ["human_v37_MT"]
 ```
 
+As you can hopefully see, today we're working with data from 18 samples, six each from three populations: CEU, PUR, and YRI.
+
 So far we don't have any Snakemake code, but that'll soon change.
 
 #### Preparing our reference genome
+
+**Objectives: Index a reference genome using BWA and SAMtools**
+
 Remember from our discussion of reference genomes above, that the FASTA format consists of, per sequence, an ID line and a series of sequence lines. Most reference genomes are quite large, so it's very inefficient to linearly search through, say, 3 billion characters spread across 25 (or MANY more) sequences.  So, many programs use various hashing/indexing strategies to more efficiently handle the data. We'll create two of the most commonly required index files - .dict and .fai - which will summarize the reference sequences.  We'll also create the required index for ``bwa``, our read mapper, which will allow ``bwa`` to quickly search for matches in the reference.  This is all we'll need for our purposes today, but check any additional tools you incorporate into your work down the line to see if they require additional indexing or processing of reference assemblies.  For example, each read mapper will likely require its own unique index, so your ```bwa``` indices won't work for, say, ```bowtie2``` or ``hisat2``.
+
+Today our reference is the mitochondrial genome sequence from the 1000 Genomes Project reference genome. See the README in the ``reference`` directory for more information about how it was extracted.
 
 From the main project directory, run the following three commands:
 
@@ -492,28 +510,33 @@ Job counts:
 
 You can see that Snakemake is now going to run ``rule prepare_reference`` to create the input of ``rule all``.
 
-** Further questions for thought/discussion **
+**Questions for further thought/discussion**
 1. Why did I include ``{assembly}`` as a variable, when we only have one value in ``assemblies``?
 
 2. Take a look at the contents of ``reference/human_v37_MT.dict`` with the command ``cat reference/human_v37_MT.dict``. What information does it contain? What does M5 mean and why is that value important?
 
+3. Generally speaking, you should map sequencing reads to the whole genome and not just a single region (we're doing the latter today to allow analyses to be run quickly on a local computer). Why do you think this is the case?
+
 #### Inspecting read quality
+
+**Objectives: Use fastqc and multiqc to explore sequencing read quality in FASTQ files**
+
 The first thing you should do when you get FASTQ files is get a sense of their quality.  The quickest way to do this is to run ```fastqc``` and take a look at the reports.
 
-We've provided 36 FASTQ files: forward and reverse reads from 18 individuals from three populations. These are located in the ``fastq`` directory.
+We've provided 36 FASTQ files: forward and reverse reads from 18 individuals from three populations in the 1000 Genomes Project. These are located in the ``fastq`` directory. The README in the ``fastq`` directory has more information about the samples and how we obtained the files.
 
 Let's generate a fastqc report for one of the samples. For this we can use the command:
 
 ```
 $ fastqc -o fastqc_results fastq/CEU_NA07000_MT.*
 ```
-The asterisk means "anything", so this command can be read as "use fastqc on anything that starts with fastq/CEU_NA07000_MT. and output to the directory called fastqc_results.
+The asterisk means "anything", so this command can be read as "use fastqc on anything that starts with fastq/CEU_NA07000_MT. and output to the directory called fastqc_results."
 
-This command should take a few seconds to complete and output a .zip and .html file for each of the two fastqs (it'll take longer for full-sized files).  You can open the .html locally on your computer in your browser. Let's open up both of the .html files.
+This command should take a few seconds to complete and output a .zip and .html file for each of the two FASTQs (it'll take longer for full-sized files).  You can open the .html locally on your computer in your browser. Let's open up both of the .html files.
 
 Overall, they seem to be of good quality. Per base sequence quality stays high across the read (i.e., above 30). GC and sequence content look good. We also don't see much in the way of sequence duplication or overrepresented sequences.
 
-If your sequences are of an unexpectedly low quality it might be worth contacting your sequencing center.  Otherwise, lower quality towards the ends of the reads, some PCR duplication, and sequence content that's slightly off are all pretty typical in sequencing experiments.  Also note that certain sequencing experiments, for example those targeting coding regions like exome sequencing and RNA seq, are likely to have some odd kmers.
+If your sequences are of an unexpectedly low quality it might be worth contacting your sequencing center.  Otherwise, lower quality towards the ends of the reads, some PCR duplication, slightly lower quality on the reverse read, and sequence content that's slightly off are all pretty typical in sequencing experiments.  Also note that certain sequencing experiments, for example those targeting coding regions like exome sequencing and RNA seq, are likely to have some odd kmers.
 
 What does a very bad report look like? Take a look at the example I provided: ``example_files/SRR740818_2_fastq.html``. This comes from a large public dataset and is a very good example of a failed run.
 
@@ -606,7 +629,7 @@ rule multiqc_analysis:
 		"{params.multiqc} --interactive -f "
 		"-o multiqc_results fastqc_results"
 ```
-In addtion to the two new rules, note the additions to the input of ``rule all``, and the new program path variables.
+In addition to the two new rules, note the additions to the input of ``rule all``, and the new program path variables.
 
 We can then run our full pipeline with the command:
 
@@ -616,14 +639,16 @@ $ snakemake
 
 This should take a couple minutes to run (it has to generate 36 reports). When it's done, take a look at ``multiqc_results/multiqc_report.html``. You can see that it contains an interactive summary of all of the fastqc reports.
 
-** Further questions for thought/discussion **
+**Questions for furtherthought/discussion**
 1. In the updated Snakefile, why didn't we include any of the output of ``rule fastqc_analysis`` as input to ``rule all``?
 
 2. Why are we concerned about FASTQ quality? How might it affect downstream analyses?
 
 #### Trimming reads
 
-After getting an initial assessment of FASTQ quality. It's time to think about trimming your reads. Opinions on whether or not to trim vary immensely. In general, you should remove sequencing adapters if possible and then carefully consider whether or not to trim for quality. One thing to consider is that DNA mappers like BWA tend to handle adapters and low-quality sequence extremely well, while many RNA mappers have more trouble. If you're at all concerned, I recommend trying a variety of trimming parameters to see how they affect your data.
+**Objectives: Remove adapters and trim low-quality ends of sequencing reads**
+
+After getting an initial assessment of FASTQ quality. It's time to think about trimming your reads. Opinions on whether or not to trim vary immensely. In general, you should remove sequencing adapters if possible and then carefully consider whether or not to trim for quality. One thing to consider is that DNA mappers like BWA tend to handle adapters and low-quality sequence well, while many RNA mappers have more trouble. If you're at all concerned, I recommend trying a variety of trimming parameters to see how they affect your data.
 
 To give you a sense of tools and commands that you might use, we're going to trim using ``bbduk.sh``. I've provided Illumina adapter sequences in ``misc/adapter_sequence.fa``. The following command will remove these adapter sequences as well as do a little bit of conservative quality trimming for sample ``PUR_HG00553``:
 
@@ -767,19 +792,21 @@ rule multiqc_analysis_trimmed:
 
 Open up both multiqc reports in a browser (``multiqc_trimmed_results/multiqc_report.html`` and ``multiqc_results/multiqc_report.html``) and see how trimming affected our data.
 
-** Further questions for thought/discussion **
+**Questions for further thought/discussion**
 1. Did trimming affect any of the samples? Focus in particular on mean quality scores, N content, and adapter content.
 
 2. Are there differences among population in sequence quality and subsequent trimming results?
 
-** Alternative Programs **
+**Alternative Programs**
 While we focus on ``bbduk.sh`` here, I also recommend checking out [Trimmomatic](http://www.usadellab.org/cms/?page=trimmomatic), [cutadapt](http://cutadapt.readthedocs.io/en/stable/guide.html) and [Trim Galore!](http://www.bioinformatics.babraham.ac.uk/projects/trim_galore/).
 
 #### Mapping reads to the reference genome and processing alignments
 
+**Objectives: map reads to reference genome and convert alignments to BAM format; understand SAM/BAM format**
+
 Our next step involves mapping our reads to our reference.  We'll use the [bwa mem](http://bio-bwa.sourceforge.net/bwa.shtml) algorithm to do this, as it's among the most popular mappers and works very well mapping reads to a closely related reference.  Other popular mappers include [Bowtie2](http://bowtie-bio.sourceforge.net/bowtie2/index.shtml), [minimap2](https://github.com/lh3/minimap2), [Novoalign](http://www.novocraft.com/products/novoalign/), and [Stampy](http://www.well.ox.ac.uk/stampy) (Stampy, in particular, for mapping to a very evolutionary diverged reference genome). Note that for RNA seq data you would use different mappers like [Star](https://github.com/alexdobin/STAR) and [hisat2](https://ccb.jhu.edu/software/hisat2/index.shtml), among many others.
 
-The command line for bwa mem is quite straightforward.  From the main directory, we can execute the following command:
+The command line for ``bwa mem`` is quite straightforward.  From the main directory, we can execute the following command:
 
 ```
 $ bwa mem reference/human_v37_MT.fasta trimmed_fastqs/YRI_NA18498_trimmed_read1.fastq.gz trimmed_fastqs/YRI_NA18498_trimmed_read2.fastq.gz > bams/YRI_NA18498.sam
@@ -787,7 +814,7 @@ $ bwa mem reference/human_v37_MT.fasta trimmed_fastqs/YRI_NA18498_trimmed_read1.
 
 This will map both sets of paired-end reads from ``YRI_NA18498`` to our reference genome and output the alignments in SAM format in our ``bams`` directory.
 
-If we take a look at the top of the file using ```$ head -n 4 bams/YRI_NA18498.sam```, we see the following:
+If we take a look at the top of the file using ``$ head -n 4 bams/YRI_NA18498.sam``, we see the following:
 
 ```
 @SQ	SN:MT	LN:16569
@@ -806,13 +833,16 @@ $ bwa mem reference/human_v37_MT.fasta trimmed_fastqs/YRI_NA18498_trimmed_read1.
 Great! We've mapped reads, corrected read pairing, and converted to BAM format! However, the bam file we just created contains all of our alignments, but it's currently unordered, unlabeled, unfiltered, and unindexed.
 
 ##### Adding read groups
+
+**Objectives: add read group information to a BAM file, learn how to view a BAM file**
+
 Read groups are very useful when you're working with multiple samples, sequencing lanes, flowcells, etc.  Importantly for us, it'll help our downstream variant caller label samples correctly and handle potential sequencing batch effects.  [Picard](https://broadinstitute.github.io/picard/command-line-overview.html) is very commonly used to add read groups to bam files, but ```bwa``` also has the ability to add read groups on the fly while mapping.  This latter option will save us time and space, so we'll add read groups to individual ``YRI_NA18498`` with ```bwa``` by adding to our previous command:
   ```
   $ bwa mem -M -R '@RG\tID:YRI_NA18498\tSM:YRI_NA18498\tLB:YRI_NA18498\tPU:YRI_NA18498\tPL:Illumina' reference/human_v37_MT.fasta trimmed_fastqs/YRI_NA18498_trimmed_read1.fastq.gz trimmed_fastqs/YRI_NA18498_trimmed_read2.fastq.gz | samtools fixmate -O bam - bams/YRI_NA18498.bam
   ```
 In a perfect world, we'd know more about our sample and could use these tags more appropriately. For now we're including them as placeholders that you can fill in for your future pipelines. ID is the name of a read group (containing a unique combination of the following tags).  SM is the sample name.  LB is the sequencing library. PU is the flowcell barcode.  PL is the sequencing technology.  A number of other options exist (see the [@RG section of the SAM/BAM specifications](https://samtools.github.io/hts-specs/SAMv1.pdf) for more information).
 
-*Note that the fastq files we're using today actually contain reads from multiple lanes, etc., as we randomly grabbed them from high-coverage 1000 genomes bam files.  But for simplicity's sake in this tutorial, we'll ignore that.*
+*Note that the FASTQ files we're using today actually contain reads from multiple lanes, etc., as we randomly grabbed them from high-coverage 1000 genomes bam files.  But for simplicity's sake in this tutorial, we'll ignore that.*
 
 Let's take a look at our new BAM file. Because BAM files are compressed, we can't view them using our standard command line tools. Instead, we'll use ``samtools view``. Here's a command to print the first 5 lines of the file:
 
@@ -829,6 +859,8 @@ SRR027524.6392421	163	MT	6904	60	76M	=	7053	225	GATCTGCTGCAGTGCTCTGAGCCCTAGGATTC
 Notice the new ``@RG`` line (2nd line) that gives the read group ID (``ID``) and the associated values. You should also be able to see that each read now has a ``RG`` tag (``RG:Z:YRI_NA18498``) telling us what read group that particular read belongs to. In our example we only have one read group, but you can imagine how this becomes useful if a BAM file contains data from multiple sequencing lanes, sequencing libraries, samples, etc.
 
 ##### Sorting bam files
+
+**Objectives: learn how to sort a BAM file in genomic coordinate order**
 
 Sorting doesn't require too much explanation.  Most genomic datasets are huge, so it's inefficient to move along unsorted bam files (we need access to all reads covering a given base for variant calling, for example).  ```samtools sort ``` is widely used, and that's what we'll employ here.  Like our previous tools, it handles streaming input, so we can simply add to our previous command to save space:
   ```
@@ -850,6 +882,7 @@ SRR027523.7329778	353	MT	1	60	44H32M	=	83	154	GATCACAGGTCTATCACCCTATTAACCACTCA	A
 You can see that there is one major change to the header.  There is a @HD line in the header indicating that the file is sorted in coordinate order ("SO:coordinate"),
 
 ##### Indexing
+
 Again, BAM files can get pretty big and they're compressed, so we need to index them for other tools to use them. Here's a simple command for indexing our bam (from our main directory):
 ```
 $ samtools index bams/YRI_NA18498.sorted.bam
@@ -1077,6 +1110,9 @@ YRI_NA18501.human_v37_MT.sorted.bam.bai
 A sorted BAM and corresponding index are present for every sample.
 
 #### Marking duplicate reads in BAM files
+
+**Objectives: introduce duplicate reads and how to mark/remove them**
+
 During library preparation for sequencing, amplification steps can lead to PCR duplicates of reads.  The inclusion of duplicate reads can negatively affect our downstream analyses, so we need to mark or remove them (marking allows downstream tools to ignore them). Much like trimming, opinions differ on how important it is to remove duplicates. With improving library preparation methods, duplicates probably only have a minor effect on downstream variant calling. However, in cases of lower quality samples, of targeted capture, or when count data matters, duplication will have a greater effect. As long as you're working with smaller datasets and you're not computationally limited, it safe enough to mark/remove duplicates.
 
 Today, we're going to use [Picard](https://broadinstitute.github.io/picard/command-line-overview.html), as it's going to be required if you have a single sample sequenced across multiple sequencing flowcells. If you're working with smaller datasets where each sample is only sequenced on a single flowcell, I recommend taking a look at  [Samblaster](https://github.com/GregoryFaust/samblaster), which can take streaming output from ``bwa``, speeding up duplicate removal and allowing us to produce one less bam file (saving us space). [Sambamba](http://lomereiter.github.io/sambamba/) is another nice option.  Note that at the time of writing this tutorial, [the developers of Samtools suggest against using it to remove duplicates](https://github.com/samtools/samtools/issues/614).
@@ -1294,12 +1330,14 @@ $ snakemake
 
 ```
 
-** Further questions for thought/discussion **
+**Questions for further thought/discussion**
 1. Why do you think Picard can only remove duplicates from a BAM file in genomic coordinate sorted order?
 
 2. If duplicates can possibly affect even one variant, why is there debate about removing them? What are possible arguments against duplicate removal?
 
 #### Exploring SAM/BAM files
+
+**Objectives: calculate various BAM file metrics**
 
 We've already seen how we can view BAM files using ``samtools view``, but there are usually millions of sequencing reads. How can we efficiently summarize a BAM file?
 
@@ -1617,12 +1655,14 @@ rule qualimap_multibamqc:
 
 This will take a couple minutes to run. When it's done, take a look at the Qualimap file summarizing all of the samples, ``stats/qualimap/human_v37_MT/multisampleBamQcReport.html``, which you can open in your browser.
 
-** Further questions for thought/discussion **
+**Questions for further thought/discussion**
 1. We started with 10,000 reads per sample (5,000 forward and 5,000 reverse)--why are there fewer reads in each of the BAM files?
 
 2. Is coverage uniform across the mitochondrial genome? How does this affect our target depth of coverage for sequencing?
 
 #### Variant calling
+
+**Objectives: jointly call variants across all samples**
 
 Now that we've trimmed and mapped our reads, labeled and sorted reads in our BAM files, removed duplicates, and assessed our mapping success, it's finally time to call variants. By "call variants", I mean statistically infer genotypes.
 
@@ -1958,10 +1998,10 @@ $ snakemake
 
 The final output file, ``genotyped_vcfs/human_v37_MT.gatk.called.raw.vcf.gz`` is an unfiltered VCF file containing only variant sites. Viewing, understanding, and filtering this file is the subject of the next session, taught by Maria Nieves Colon.
 
-** Further questions for thought/discussion **
+**Questions for further thought/discussion**
 1. Are there times that it might be inappropriate to jointly genotype samples?
 
-** Additional Programs **
+**Additional Programs**
 I recommend also checking out [Freebayes](https://github.com/ekg/freebayes). If you're working with low coverage data, you should consider working with [ANGSD](http://www.popgen.dk/angsd/index.php/ANGSD).
 
 ## Running our pipeline
