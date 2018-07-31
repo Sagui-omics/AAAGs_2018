@@ -37,7 +37,7 @@ Topics: Molecular genetic and genomic analysis of gene variants
 Instructor: Drs. Antonio Herrera  (Stony Brook University)  
 Info: Identifying sources of variation and the role of mutation in the evolution of DNA sequence and gene function. Using python, we will explore aspects of molecular genetic and genomic function of identified variants and generate hypotheses about their effect on gene function.  
 
-**Session 7**
+**Session 7**  
 Topics: Structural Variants and Haplotype Interval Matching  
 Instructors: Dr. Omer Gokcumen and Yen-Lung Onta Lin (University of Buffalo)  
 Info: Investigate genomic outliers and associated haplotypes for their impact on gene expression function, loss of function variants, etc.  
