@@ -1,0 +1,235 @@
+---
+title: "Tidy Data Manipulation - AGAR 2018"
+author: "Ellen Quillen"
+date: "July 12, 2018"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Data Manipulation
+Helpful data sheets for a variety of tidyverse packages including tidyr and ggplot2 are available here: https://www.rstudio.com/resources/cheatsheets/ 
+
+
+#Tidy Data
+Hadley Wickham's tretise on the logic of tidy data is here: http://vita.had.co.nz/papers/tidy-data.pdf. Tidy data has 
+
+#Data Manipulation Examples in tidyr
+These examples are heavily inspired by the tutorials available at https://github.com/rstudio/master-the-tidyverse/
+
+```{r dplyr basics}
+#install packages
+#install.packages("tidyverse")
+
+#load libraries
+library(tidyverse)
+
+#load data with base R as data.frame and readr as tibble
+dir = "C:/Users/Ellen/Dropbox/AAAG/AGAR/AGAR 2018/R Viz/dplyr session/"
+
+gene.counts.df<-read.table(file=paste0(dir,"example_gene_counts.txt"),header=TRUE)
+gene.counts.df
+head(gene.counts.df)
+
+gene.counts<-read_tsv(file=paste0(dir,"example_gene_counts.txt"), col_names = TRUE, comment = "##", skip = 0, na = c("", "NA","."))
+gene.counts
+names(gene.counts)=c("Gene",names(gene.counts)[1:6])
+
+gene.counts<-read_tsv(file=paste0(dir,"example_gene_counts.txt"), col_names = c("Gene","H0","H1","H2","C0","C1","C2"), na = c("", "NA","."),  skip = 1)
+gene.counts
+
+summary(gene.counts)
+View(gene.counts)
+
+gene.counts.df<-read.table(file=paste0(dir,"example_gene_counts.txt"),header=TRUE)
+gene.counts<-rownames_to_column(gene.counts.df,"gene")
+gene.counts<-as.tibble(gene.counts)
+gene.counts
+
+```
+
+```{r tidytools}
+#tidy verbs: filter, select, mutate, summarize, and arrange
+
+sample.info<-read_tsv(file=paste0(dir,"example_sample_info.txt"))
+
+sample.filtered<-filter(sample.info,Species=="human")
+sample.filtered
+
+sample.selected<-select(sample.filtered, -CellDensity)
+sample.selected
+
+sample.mutated<-mutate(sample.selected,scaledRNA=RNAConcentration/CellViability)
+sample.mutated
+
+sample.summary<-summarize(sample.mutated,avg=mean(scaledRNA))
+sample.summary
+
+#using pipe %>% 
+myresult<-sample.info %>% 
+  filter(Species=="human") %>% 
+  select(-CellDensity) %>%
+  mutate(scaledRNA=RNAConcentration/CellViability) %>%
+  summarize(avg=mean(scaledRNA),max=max(scaledRNA),min=min(scaledRNA))
+
+sample.arranged<-arrange(sample.mutated,scaledRNA)
+sample.arranged
+sample.arranged<-arrange(sample.mutated,desc(scaledRNA))
+sample.arranged
+
+```
+
+```{r useful base functions}
+#most base R functions can be called on tibbles
+viability.t <- t.test(sample.info$CellViability ~ sample.info$Species)
+viability.t
+boxplot(sample.info$CellViability ~ sample.info$Species)
+summary(lm(sample.info$RNAConcentration ~ sample.info$CellViability))
+plot(sample.info$CellViability,sample.info$RNAConcentration)
+
+sample.clean = filter(sample.info,CellViability > 0.50)
+sample.clean
+plot(sample.clean$CellViability,sample.clean$RNAConcentration)
+abline(lm(sample.clean$RNAConcentration~sample.clean$CellViability))
+```
+
+```{r data wrangling examples}
+#combining and selecting columns with select
+sample.mapping<-read_tsv(file=paste0(dir,"example_read_mapping_summary.txt"))
+sample.mapping
+sample.highmap<-filter(sample.mapping,PropMapped>0.81)
+
+left_join(sample.highmap, sample.clean, by="Samples")
+right_join(sample.highmap, sample.clean, by="Samples")
+inner_join(sample.highmap, sample.clean, by="Samples")
+full_join(sample.highmap, sample.clean, by="Samples")
+
+anti_join(sample.highmap, sample.clean, by="Samples")
+anti_join(sample.clean, sample.highmap, by="Samples")
+
+sample.highmap<-rename(sample.highmap, SampleName = Samples)
+sample.data=full_join(sample.highmap, sample.clean, by=c("SampleName" = "Samples"))
+
+select(sample.data,1:3)
+select(sample.data, SampleName, CellDensity, CellViability)
+vars<-c("CellDensity","CellViability", "SampleName")
+select(sample.data,one_of(vars))
+select(sample.data,contains("cell"))
+
+#stringr allows regex matches, note TimePoint not included
+select(sample.data,matches(".t."))
+
+#creating new variables with mutate
+
+#note this isn't a tidy tibble and so working "rowwise" isn't loved by dplyr (or R in general)
+gene.counts<-mutate(gene.counts,ZeroCount = (H0 ==0) + (H1 ==0) + (H2 ==0) + (C0 ==0) + (C1 ==0) + (C2 ==0))
+gene.counts
+
+summarise_at(gene.counts,c("H0","H1","H2","C0","C1","C2"),var)
+
+rv <- apply(gene.counts[,2:7], MARGIN=1, FUN=var)
+length(rv)
+rv<-as.tibble(rv)
+gene.counts <- bind_cols(gene.counts,rv)
+gene.counts
+gene.counts<-rename(gene.counts,Variance=value)
+gene.counts
+
+#mutate and replace with log
+gene.counts.log<-gene.counts %>% mutate_at(vars(matches(".[0-2]")), funs(log2(.+1)))
+gene.counts.log
+
+#subsetting tibbles with filtr and group_by
+gene.counts.clean <- filter(gene.counts.log, ZeroCount > 2 & Variance > 5000)
+gene.counts.clean
+
+gene.counts.select <-filter(gene.counts,gene %in% c("ENSG00000001084", "ENSG00000001167", "ENSG00000000419"))
+gene.counts.select
+
+#group_by
+sample.info %>% 
+  group_by(Species) %>%
+  summarise(mean.viability = mean(CellViability))
+
+#saving data
+write_delim(gene.counts.clean, file.path(dir, "gene_counts_clean.csv"),delim=",")
+
+write_csv(gene.counts.clean, file.path(dir, "gene_counts_clean.csv"))
+
+```
+
+
+#Exercises
+(1)	Read in human_v37_MT.gatk.called.filt_snps.vcf without the metadata
+(2) Rename the first column
+(3) Create a new tibble that only contains files that passed the filter
+(4) Group by population and calculate average quality score (QUAL)
+(5) Create separate tibbles for CEU, PUR, and YRI 
+(6) Using gene.log from above, find minimum and maximum values for each gene and scale to 0-1 (subtract min and divide by max)
+
+
+```{r functions}
+#creating a function for frequently used sets of commands
+clean_gene_counts <- function (x){
+  myresult<-x %>% 
+  filter(Species=="human") %>% 
+  select(-CellDensity) %>%
+  mutate(scaledRNA=RNAConcentration/CellViability) %>%
+  summarize(avg=mean(scaledRNA),max=max(scaledRNA),min=min(scaledRNA))
+}
+
+clean_gene_counts(sample.info)
+myresult
+
+clean_return_counts <- function (x){
+  myresult<-x %>% 
+  filter(Species=="human") %>% 
+  select(-CellDensity) %>%
+  mutate(scaledRNA=RNAConcentration/CellViability) %>%
+  summarize(avg=mean(scaledRNA),max=max(scaledRNA),min=min(scaledRNA))
+  return(myresult)
+}
+clean_return_counts(sample.info)
+
+```
+
+#Exercises
+(1) Write a function to remove loci QUAL < 2000 from a generic data set and apply it to each tibble from (5) above.
+
+```{r iterations}
+#lets make gene.counts into a tidy data set
+dim(gene.counts.df)
+t.gene.counts<-t(gene.counts.df)
+t.gene.counts<-as.data.frame(t.gene.counts)
+row.names(t.gene.counts)
+t.gene.counts<-rownames_to_column(t.gene.counts,"gene")
+t.gene.counts<-as.tibble(t.gene.counts)
+head(names(t.gene.counts))
+t.counts<-select(t.gene.counts,1:20)
+t.counts
+
+rescale01 <- function(x) {
+  rng <- range(x, na.rm = TRUE)
+  (x - rng[1]) / (rng[2] - rng[1])
+}
+
+counts.rescale<-select(t.counts,gene)
+
+for (i in 2:length(names(t.counts))) {
+  value <- as.tibble(rescale01(t.counts[,i]))
+  counts.rescale<-bind_cols(counts.rescale,value)
+}
+
+```
+
+#Exercises
+(1) Use a loop to find the min, max, and mean of each gene and put that in a new tibble. 
+
+#Additional Resources
+R for Data Science by Hadley Wickham & Garrett Grolemund (O'Reilly) in an outstanding reference and can be purchased in hardcopy or read online http://r4ds.had.co.nz/
+
+

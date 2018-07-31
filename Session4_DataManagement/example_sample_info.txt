@@ -1,0 +1,7 @@
+Samples	Species	TimePoint	CellDensity	CellViability	RNAConcentration
+H0	human	0	0.8	0.89	377
+H1	human	1	1	0.875	257
+H2	human	2	0.6	0.81	109
+C0	chimp	0	0.9	0.93	219
+C1	chimp	1	1	0.39	160
+C2	chimp	2	0.3	0.715	90
