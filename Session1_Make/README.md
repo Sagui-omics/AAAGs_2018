@@ -22,14 +22,14 @@ You could write a series of shell scripts (which is fine), but Make and other bu
     * Align a number of fastq Illumina files to the human reference genome with BWA 
     
 ```
-$bwa mem sample1.F1.fastq sample2.R1.fastq > sample1.sam
+$bwa mem sample1.F1.fastq sample2.R1.fastq  human_ref_genome.fa > sample1.sam
 ```  
 What is you had 10s or 100s files to process? This is where GNu Make can help. 
 Start by setting up a _rule_ to process your task:
 
 ```
-sample1.sam: sample1.F1.fastq sample2.R1.fastq
-	bwa mem sample1.F1.fastq sample2.R1.fastq > sample1.sam
+sample1.sam: sample1.R1.fastq sample1.R2.fastq
+	bwa mem sample1.R1.fastq sample1.R2.fastq > sample1.sam
 ```
 
 sample1.sam is the _target_ (or end result) of your rule 
@@ -67,8 +67,8 @@ $(VARIALBLE_NAME) is a way to call whatever variable you set within a Makefile
 Then finally the generalized rule will use some automatic Make variables. 
 
 ```
-    %.bam  :  %.unassembled.forward.fastq /%.unassembled.reverse.fastq
-		bwa mem -t 10 $(REF) $^ > $@ 
+    %.sam : %.R1.fastq %.R2.fastq
+		bwa mem $(REF) $^ > $@ 
 
 ```
 % is a wild card character that will stand in for sample1, sample2, etc for the bam and fastq files 
@@ -104,8 +104,8 @@ OUTPUTFILES := $(shell cat $(DATABASE))
 
 all: $(OUTPUTFILES)
 
-%.sam  :  %.unassembled.forward.fastq /%.unassembled.reverse.fastq
-	bwa mem -t 10 $(REF) $^ > $@  
+    %.sam : %.R1.fastq %.R2.fastq
+		bwa mem $(REF) $^ > $@ 
 ```
 
 
