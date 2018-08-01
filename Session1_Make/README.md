@@ -75,14 +75,14 @@ Then finally the generalized rule will use some automatic Make variables.
 $^ refers to your dependencies (%.unassembled.forward.fastq /%.unassembled.reverse.fastq)
 $@ refers to your target (%.bam)
 
-To process the make file you will type
+To process the Makefile you will type
 
 ```
 $make all
 ```
 
 All together, Make will go through your list of output bams and process them all one by one (though it it possible to parallelize the process).
-If you type make again, Make won't run again if it has processed all targets and rules. However, if you add in a new set of fastq files and run make, Make will just process the newly added fastq files. 
+If you type make all again, Make won't run again if it has processed all targets and rules. However, if you add in a new set of fastq files and run make, Make will just process the newly added fastq files. 
 
 ```
 # make a list of all the sam file targets you want to produce and define it as a variable 
