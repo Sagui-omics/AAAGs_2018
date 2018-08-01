@@ -84,6 +84,14 @@ $make all
 All together, Make will go through your list of output bams and process them all one by one (though it it possible to parallelize the process).
 If you type make all again, Make won't run again if it has processed all targets and rules. However, if you add in a new set of fastq files and run make, Make will just process the newly added fastq files. 
 
+If you have multiple target rules, and you only want to run a rule for a specific target, write
+
+```
+$make <target_name>
+```
+
+
+The complete example code 
 ```
 # make a list of all the sam file targets you want to produce and define it as a variable 
 DATABASE = output_files.txt 
@@ -100,16 +108,8 @@ all: $(OUTPUTFILES)
 	bwa mem -t 10 $(REF) $^ > $@  
 ```
 
-If you have multiple target rules, and you only want to run a rule for a specific target, write
-
-```
-$make <target_name>
-```
 
 
-The complete code 
-
-```
 
 ## 3. Example 2  (More Advanced)
 
