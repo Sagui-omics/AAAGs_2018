@@ -148,7 +148,7 @@ OUTPUTFILES:= $(shell cat $(output))
 
 .PHONY: all
 
-all: $(OUTPUTFILES) rename
+all: $(OUTPUTFILES) 
 
 #get EPAS1 sequences from 1000 Genome dataset 
 %.cram : 
