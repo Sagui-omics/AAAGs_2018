@@ -209,7 +209,7 @@ We're going to use [Conda](https://conda.io/docs/), described above, to install 
 * Create the environment we'll be working in and install required packages with the command:
 
   ```
-  $ conda create -n agar2018 python=3.6 'snakemake>=5.2 samtools bwa bioawk fastqc multiqc bbmap qualimap gatk4 vcftools picard
+  $ conda create -n agar2018 python=3.6 'snakemake>=5.2' samtools bwa bioawk fastqc multiqc bbmap qualimap gatk4 vcftools picard
   ```
 
 	This will create a working environment called agar2018 containing python 3.6 (python 3 is required for snakemake) and all of the tools listed in the command.  You can see the full list of programs available through Bioconda [listed here](https://bioconda.github.io/) and the full list of python packages available through Anaconda [listed here](https://docs.continuum.io/anaconda/pkg-docs). Note that there are many other channels to check as well (particularly, conda-forge).
