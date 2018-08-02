@@ -1,0 +1,5 @@
+HG00419.alt_bwamem_GRCh38DH.20150917.CHS.high_coverage.cram
+NA20845.alt_bwamem_GRCh38DH.20150917.GIH.high_coverage.cram
+NA19625.alt_bwamem_GRCh38DH.20150917.ASW.high_coverage.cram
+NA19017.alt_bwamem_GRCh38DH.20150917.LWK.high_coverage.cram
+HG03052.alt_bwamem_GRCh38DH.20150917.MSL.high_coverage.cram
