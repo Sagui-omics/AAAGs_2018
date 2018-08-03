@@ -4,6 +4,9 @@
 
 This session features a hands on introduction to the basics of read mapping, BAM file processing, and variant calling. We will also discuss various file types that you'll encounter along the way: FASTA, FASTQ, SAM/BAM, and VCF.
 
+**Updates**
+2018-08-02: Updated ``rule qualimap_per_sample`` in README and example_snakefile to reflect Snakemake 5.2's requirement that directory output targets are declared. Updated ``conda create`` command in "Setting Up" to force installation of Snakemake 5.2. Add exception to .gitignore for chimp_MT.fasta
+
 **Table of Contents**
 
 - Reference-based vs. *de novo* assembly
@@ -206,7 +209,7 @@ We're going to use [Conda](https://conda.io/docs/), described above, to install 
 * Create the environment we'll be working in and install required packages with the command:
 
   ```
-  $ conda create -n agar2018 python=3.6 snakemake samtools bwa bioawk fastqc multiqc bbmap qualimap gatk4 vcftools picard
+  $ conda create -n agar2018 python=3.6 'snakemake>=5.2' samtools bwa bioawk fastqc multiqc bbmap qualimap gatk4 vcftools picard
   ```
 
 	This will create a working environment called agar2018 containing python 3.6 (python 3 is required for snakemake) and all of the tools listed in the command.  You can see the full list of programs available through Bioconda [listed here](https://bioconda.github.io/) and the full list of python packages available through Anaconda [listed here](https://docs.continuum.io/anaconda/pkg-docs). Note that there are many other channels to check as well (particularly, conda-forge).
@@ -1616,7 +1619,7 @@ rule qualimap_per_sample:
 		bam = "bams/{sample}.{assembly}.sorted.mkdup.bam",
 		bai = "bams/{sample}.{assembly}.sorted.mkdup.bam.bai"
 	output:
-		"stats/qualimap/{assembly}/{sample}"
+		directory("stats/qualimap/{assembly}/{sample}")
 	params:
 		qualimap = qualimap_path,
 		out_dir = "stats/qualimap/{assembly}/{sample}/"
@@ -1903,7 +1906,7 @@ rule qualimap_per_sample:
 		bam = "bams/{sample}.{assembly}.sorted.mkdup.bam",
 		bai = "bams/{sample}.{assembly}.sorted.mkdup.bam.bai"
 	output:
-		"stats/qualimap/{assembly}/{sample}"
+		directory("stats/qualimap/{assembly}/{sample}")
 	params:
 		qualimap = qualimap_path,
 		out_dir = "stats/qualimap/{assembly}/{sample}/"
@@ -2279,7 +2282,7 @@ rule qualimap_per_sample:
 		bam = "bams/{sample}.{assembly}.sorted.mkdup.bam",
 		bai = "bams/{sample}.{assembly}.sorted.mkdup.bam.bai"
 	output:
-		"stats/qualimap/{assembly}/{sample}"
+		directory("stats/qualimap/{assembly}/{sample}")
 	params:
 		qualimap = qualimap_path,
 		out_dir = "stats/qualimap/{assembly}/{sample}/"

@@ -208,7 +208,7 @@ rule qualimap_per_sample:
 		bam = "bams/{sample}.{assembly}.sorted.mkdup.bam",
 		bai = "bams/{sample}.{assembly}.sorted.mkdup.bam.bai"
 	output:
-		"stats/qualimap/{assembly}/{sample}"
+		directory("stats/qualimap/{assembly}/{sample}")
 	params:
 		qualimap = qualimap_path,
 		out_dir = "stats/qualimap/{assembly}/{sample}/"
