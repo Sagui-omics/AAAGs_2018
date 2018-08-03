@@ -1,0 +1,1 @@
+install.packages(c("BSgenome.Hsapiens.UCSC.hg19","GenomicFeatures","GenomicRanges","ggdendro","ggplot2","gplots","grid","gridExtra","gtable","Gviz","RColorBrewer","reshape2","RMariaDB","rtracklayer","scales","tidyverse","TxDb.Hsapiens.UCSC.hg19.knownGene","vcfR","viridisLite"))
